@@ -13,7 +13,7 @@ import { diagnoseState } from "./logic/diagnosisAgent";
 import { calculatePower, calculatePowerGain } from "./logic/powerModel";
 import { calculateVirtualSensors } from "./logic/sensorModel";
 import { calculateSunPosition } from "./logic/sunModel";
-import { clamp, runTrackingStep } from "./logic/trackingAgent";
+import { calculateAngleErrors, clamp, runTrackingStep } from "./logic/trackingAgent";
 import { inferVirtualVision } from "./logic/visionModel";
 import { calculateWeather } from "./logic/weatherModel";
 import type { Scenario, SolarState } from "./types/solar";
@@ -32,6 +32,8 @@ function createInitialState(): SolarState {
     sunElevation: sun.sunElevation,
     panelAzimuth: -35,
     panelElevation: 25,
+    azimuthError: 0,
+    elevationError: 0,
     leftLight: 0,
     rightLight: 0,
     topLight: 0,
@@ -54,6 +56,7 @@ function createInitialState(): SolarState {
     batteryVoltage: 12.1,
     scenario: initialScenario,
     phase: "idle",
+    phaseReason: "시뮬레이션 시작 전입니다.",
     diagnosis: "시뮬레이션 대기",
     action: "시작 버튼을 눌러 태양 추적 흐름을 확인하세요.",
     riskLevel: "normal",
@@ -81,6 +84,11 @@ function recalculateState(input: SolarState): SolarState {
   const vision = inferVirtualVision(input.scenario);
   const sun = calculateSunPosition(input.time);
   const panelTemp = input.scenario === "overheat" ? 68 : weather.temperature + 5;
+  const angleErrors = calculateAngleErrors({
+    ...sun,
+    panelAzimuth: input.panelAzimuth,
+    panelElevation: input.panelElevation,
+  });
   const sensors = calculateVirtualSensors({
     ...sun,
     panelAzimuth: input.panelAzimuth,
@@ -106,6 +114,7 @@ function recalculateState(input: SolarState): SolarState {
   const nextState = {
     ...input,
     ...sun,
+    ...angleErrors,
     ...sensors,
     weather,
     vision,
@@ -194,7 +203,7 @@ function App() {
     <main className="app-shell">
       <header className="topbar">
         <div>
-          <p className="eyebrow">v02 태양/센서/발전량 모델</p>
+          <p className="eyebrow">v03 순차제어 Agent</p>
           <h1>SolarTrack Agent</h1>
         </div>
         <div className="status-strip">
@@ -242,11 +251,7 @@ function formatTime(time: number) {
 }
 
 function logForPhase(state: SolarState) {
-  if (state.phase === "hold") return "기상 또는 비전 조건으로 추적을 보류했습니다.";
-  if (state.phase === "azimuth_align") return "하부 방위각을 정렬했습니다.";
-  if (state.phase === "elevation_align") return "상부 고도각을 정렬했습니다.";
-  if (state.phase === "power_verify") return "발전량 개선률을 검증했습니다.";
-  return "기상, 센서, 발전량 상태를 갱신했습니다.";
+  return state.phaseReason || "기상, 센서, 발전량 상태를 갱신했습니다.";
 }
 
 function appendLog(logs: string[], message: string) {

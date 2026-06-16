@@ -52,6 +52,8 @@ export type SolarState = {
   sunElevation: number;
   panelAzimuth: number;
   panelElevation: number;
+  azimuthError: number;
+  elevationError: number;
   leftLight: number;
   rightLight: number;
   topLight: number;
@@ -67,6 +69,7 @@ export type SolarState = {
   batteryVoltage: number;
   scenario: Scenario;
   phase: AgentPhase;
+  phaseReason: string;
   diagnosis: string;
   action: string;
   riskLevel: RiskLevel;

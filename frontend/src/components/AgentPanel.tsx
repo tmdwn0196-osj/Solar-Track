@@ -24,6 +24,16 @@ export function AgentPanel({ state }: { state: SolarState }) {
           <dd>{phaseLabels[state.phase]}</dd>
         </div>
         <div>
+          <dt>단계 사유</dt>
+          <dd>{state.phaseReason}</dd>
+        </div>
+        <div>
+          <dt>정렬 오차</dt>
+          <dd>
+            방위각 {state.azimuthError.toFixed(1)}도, 고도각 {state.elevationError.toFixed(1)}도
+          </dd>
+        </div>
+        <div>
           <dt>진단</dt>
           <dd>{state.diagnosis}</dd>
         </div>

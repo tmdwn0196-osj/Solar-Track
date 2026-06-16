@@ -5,6 +5,14 @@ export function diagnoseState(state: SolarState): {
   action: string;
   riskLevel: RiskLevel;
 } {
+  if (state.phase === "idle") {
+    return {
+      diagnosis: "시뮬레이션 대기",
+      action: "시작 버튼을 눌러 순차제어 흐름을 확인하세요.",
+      riskLevel: "normal",
+    };
+  }
+
   if (state.scenario === "overheat" || state.panelTemp >= 65) {
     return {
       diagnosis: "패널 과열",
@@ -21,10 +29,18 @@ export function diagnoseState(state: SolarState): {
     };
   }
 
-  if (state.powerGainRate >= 5) {
+  if (state.phase === "power_verify" && state.powerGainRate >= 5) {
     return {
       diagnosis: "추적 보정 성공",
       action: "방위각과 고도각 조정 후 발전량이 개선되었습니다.",
+      riskLevel: "normal",
+    };
+  }
+
+  if (state.phase === "azimuth_align" || state.phase === "elevation_align" || state.phase === "weather_check") {
+    return {
+      diagnosis: "순차제어 진행 중",
+      action: "방위각 정렬을 먼저 끝낸 뒤 고도각 정렬과 발전량 검증을 진행합니다.",
       riskLevel: "normal",
     };
   }

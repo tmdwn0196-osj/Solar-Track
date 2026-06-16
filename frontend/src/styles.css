@@ -266,10 +266,15 @@ select {
 }
 
 .control-group p,
-.panel-note {
+.panel-note,
+.formula {
   color: #5f6f67;
   line-height: 1.55;
   font-size: 0.9rem;
+}
+
+.formula {
+  margin-bottom: 12px;
 }
 
 .manual-grid {

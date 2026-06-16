@@ -35,6 +35,15 @@ export type VisionState = {
   note: string;
 };
 
+export type PowerBreakdown = {
+  maxPower: number;
+  sunFactor: number;
+  angleFactor: number;
+  scenarioFactor: number;
+  tempFactor: number;
+  weatherFactor: number;
+};
+
 export type SolarState = {
   time: number;
   running: boolean;
@@ -53,6 +62,7 @@ export type SolarState = {
   fixedPower: number;
   trackedPower: number;
   powerGainRate: number;
+  powerBreakdown: PowerBreakdown;
   panelTemp: number;
   batteryVoltage: number;
   scenario: Scenario;

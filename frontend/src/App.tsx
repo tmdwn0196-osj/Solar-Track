@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AgentPanel } from "./components/AgentPanel";
 import { ControlPanel } from "./components/ControlPanel";
 import { LogPanel } from "./components/LogPanel";
+import { ModelPanel } from "./components/ModelPanel";
 import { PowerChart } from "./components/PowerChart";
 import { SensorPanel } from "./components/SensorPanel";
 import { SolarScene } from "./components/SolarScene";
@@ -41,6 +42,14 @@ function createInitialState(): SolarState {
     fixedPower: 0,
     trackedPower: 0,
     powerGainRate: 0,
+    powerBreakdown: {
+      maxPower: 10,
+      sunFactor: 0,
+      angleFactor: 0,
+      scenarioFactor: 1,
+      tempFactor: 1,
+      weatherFactor: 1,
+    },
     panelTemp: 30,
     batteryVoltage: 12.1,
     scenario: initialScenario,
@@ -107,6 +116,7 @@ function recalculateState(input: SolarState): SolarState {
     fixedPower: fixed.power,
     trackedPower: tracked.power,
     powerGainRate: calculatePowerGain(fixed.power, tracked.power),
+    powerBreakdown: tracked.powerBreakdown,
     batteryVoltage: input.scenario === "charging_issue" ? 12.0 : 12.1 + tracked.power / 35,
   };
   const diagnosis = diagnoseState(nextState);
@@ -184,7 +194,7 @@ function App() {
     <main className="app-shell">
       <header className="topbar">
         <div>
-          <p className="eyebrow">v01 React 단독 시뮬레이터</p>
+          <p className="eyebrow">v02 태양/센서/발전량 모델</p>
           <h1>SolarTrack Agent</h1>
         </div>
         <div className="status-strip">
@@ -216,6 +226,7 @@ function App() {
           />
           <WeatherPanel weather={state.weather} />
           <SensorPanel state={state} />
+          <ModelPanel powerBreakdown={state.powerBreakdown} />
           <VisionPanel vision={state.vision} />
           <AgentPanel state={state} />
         </aside>

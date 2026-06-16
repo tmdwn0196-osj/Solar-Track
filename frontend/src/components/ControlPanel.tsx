@@ -1,15 +1,18 @@
 import { Minus, Pause, Play, Plus, RotateCcw, SlidersHorizontal } from "lucide-react";
 import { scenarios } from "../data/scenarios";
+import { weatherLocations } from "../data/weatherLocations";
 import type { Scenario } from "../types/solar";
 
 type ControlPanelProps = {
   running: boolean;
   autoTracking: boolean;
   scenario: Scenario;
+  weatherLocationId: string;
   onStart: () => void;
   onPause: () => void;
   onReset: () => void;
   onScenarioChange: (scenario: Scenario) => void;
+  onWeatherLocationChange: (locationId: string) => void;
   onAutoTrackingChange: (enabled: boolean) => void;
   onManualAdjust: (field: "azimuth" | "elevation", amount: number) => void;
 };
@@ -18,10 +21,12 @@ export function ControlPanel({
   running,
   autoTracking,
   scenario,
+  weatherLocationId,
   onStart,
   onPause,
   onReset,
   onScenarioChange,
+  onWeatherLocationChange,
   onAutoTrackingChange,
   onManualAdjust,
 }: ControlPanelProps) {
@@ -65,6 +70,21 @@ export function ControlPanel({
           ))}
         </select>
         <p>{scenarios.find((item) => item.value === scenario)?.description}</p>
+      </div>
+
+      <div className="control-group">
+        <span>기상 위치</span>
+        <select
+          value={weatherLocationId}
+          onChange={(event) => onWeatherLocationChange(event.target.value)}
+        >
+          {weatherLocations.map((location) => (
+            <option key={location.id} value={location.id}>
+              {location.name}
+            </option>
+          ))}
+        </select>
+        <p>{weatherLocations.find((location) => location.id === weatherLocationId)?.note}</p>
       </div>
 
       <div className="manual-grid">

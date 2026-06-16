@@ -9,19 +9,20 @@ import { SolarScene } from "./components/SolarScene";
 import { VisionPanel } from "./components/VisionPanel";
 import { WeatherPanel } from "./components/WeatherPanel";
 import { scenarios } from "./data/scenarios";
+import { defaultWeatherLocation, findWeatherLocation } from "./data/weatherLocations";
 import { diagnoseState } from "./logic/diagnosisAgent";
 import { calculatePower, calculatePowerGain } from "./logic/powerModel";
 import { calculateVirtualSensors } from "./logic/sensorModel";
 import { calculateSunPosition } from "./logic/sunModel";
 import { calculateAngleErrors, clamp, runTrackingStep } from "./logic/trackingAgent";
 import { inferVirtualVision } from "./logic/visionModel";
-import { calculateWeather } from "./logic/weatherModel";
+import { calculateWeather, fetchLocationWeather } from "./logic/weatherModel";
 import type { Scenario, SolarState } from "./types/solar";
 
 const initialScenario: Scenario = "normal";
 
 function createInitialState(): SolarState {
-  const weather = calculateWeather(initialScenario);
+  const weather = calculateWeather(initialScenario, defaultWeatherLocation);
   const vision = inferVirtualVision(initialScenario);
   const sun = calculateSunPosition(9);
   const baseState: SolarState = {
@@ -56,6 +57,7 @@ function createInitialState(): SolarState {
     panelTemp: 30,
     batteryVoltage: 12.1,
     scenario: initialScenario,
+    weatherLocationId: defaultWeatherLocation.id,
     phase: "idle",
     phaseReason: "시뮬레이션 시작 전입니다.",
     diagnosis: "시뮬레이션 대기",
@@ -82,7 +84,7 @@ function createInitialState(): SolarState {
 }
 
 function recalculateState(input: SolarState): SolarState {
-  const weather = calculateWeather(input.scenario);
+  const weather = input.weather;
   const vision = inferVirtualVision(input.scenario);
   const sun = calculateSunPosition(input.time);
   const panelTemp = input.scenario === "overheat" ? 68 : weather.temperature + 5;
@@ -146,6 +148,39 @@ function App() {
   );
 
   useEffect(() => {
+    const location = findWeatherLocation(state.weatherLocationId);
+    let cancelled = false;
+
+    setState((previous) =>
+      recalculateState({
+        ...previous,
+        weather: calculateWeather(previous.scenario, location),
+        logs: appendLog(previous.logs, `${formatTime(previous.time)} ${location.name} 기상 수집을 시작했습니다.`),
+      }),
+    );
+
+    fetchLocationWeather(location, state.scenario).then((weather) => {
+      if (cancelled) return;
+
+      setState((previous) => {
+        if (previous.weatherLocationId !== location.id || previous.scenario !== state.scenario) {
+          return previous;
+        }
+
+        return recalculateState({
+          ...previous,
+          weather,
+          logs: appendLog(previous.logs, `${formatTime(previous.time)} ${weather.locationName} 기상 반영: ${weather.label}`),
+        });
+      });
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [state.weatherLocationId, state.scenario]);
+
+  useEffect(() => {
     if (!state.running) return;
 
     const timer = window.setInterval(() => {
@@ -187,6 +222,17 @@ function App() {
     });
   }
 
+  function updateWeatherLocation(locationId: string) {
+    setState((previous) =>
+      recalculateState({
+        ...previous,
+        weatherLocationId: locationId,
+        phase: "weather_check",
+        logs: appendLog(previous.logs, `${formatTime(previous.time)} 기상 위치를 변경했습니다.`),
+      }),
+    );
+  }
+
   function adjustPanel(field: "azimuth" | "elevation", amount: number) {
     setState((previous) => {
       const next = recalculateState({
@@ -205,7 +251,7 @@ function App() {
     <main className="app-shell">
       <header className="topbar">
         <div>
-          <p className="eyebrow">v04 진단 Agent</p>
+          <p className="eyebrow">v05 위치 기상 Agent</p>
           <h1>SolarTrack Agent</h1>
         </div>
         <div className="status-strip">
@@ -226,10 +272,12 @@ function App() {
             running={state.running}
             autoTracking={state.autoTracking}
             scenario={state.scenario}
+            weatherLocationId={state.weatherLocationId}
             onStart={() => setState((previous) => ({ ...previous, running: true }))}
             onPause={() => setState((previous) => ({ ...previous, running: false }))}
             onReset={() => setState(createInitialState())}
             onScenarioChange={updateScenario}
+            onWeatherLocationChange={updateWeatherLocation}
             onAutoTrackingChange={(enabled) =>
               setState((previous) => ({ ...previous, autoTracking: enabled }))
             }

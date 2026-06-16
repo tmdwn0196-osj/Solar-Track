@@ -254,6 +254,10 @@ h2 {
   gap: 8px;
 }
 
+.control-group + .control-group {
+  margin-top: 14px;
+}
+
 .control-group span,
 .manual-grid span {
   font-size: 0.84rem;
@@ -275,6 +279,10 @@ select {
   color: #5f6f67;
   line-height: 1.55;
   font-size: 0.9rem;
+}
+
+.panel-note + .panel-note {
+  margin-top: 8px;
 }
 
 .formula {

@@ -1,46 +1,171 @@
-import type { Scenario, WeatherState } from "../types/solar";
+import { defaultWeatherLocation } from "../data/weatherLocations";
+import type { Scenario, WeatherLocation, WeatherSource, WeatherState } from "../types/solar";
 
-export function calculateWeather(scenario: Scenario): WeatherState {
-  switch (scenario) {
-    case "cloudy":
-      return {
-        label: "흐림",
-        cloudCover: 82,
-        rain: false,
-        temperature: 24,
-        windSpeed: 3.2,
-        trackingLimited: true,
-        reason: "구름량이 높아 일시적인 출력 저하 가능성이 큽니다.",
-      };
-    case "overheat":
-      return {
-        label: "고온",
-        cloudCover: 12,
-        rain: false,
-        temperature: 36,
-        windSpeed: 1.8,
-        trackingLimited: false,
-        reason: "기상은 맑지만 패널 온도 상승을 주의해야 합니다.",
-      };
-    case "shade":
-      return {
-        label: "맑음",
-        cloudCover: 24,
-        rain: false,
-        temperature: 27,
-        windSpeed: 2.4,
-        trackingLimited: false,
-        reason: "기상 조건은 안정적이며 부분 음영 가능성을 확인합니다.",
-      };
-    default:
-      return {
-        label: "맑음",
-        cloudCover: 18,
-        rain: false,
-        temperature: 25,
-        windSpeed: 2.1,
-        trackingLimited: false,
-        reason: "추적 동작이 가능한 안정적인 기상 조건입니다.",
-      };
+type WeatherValues = {
+  cloudCover: number;
+  rain: boolean;
+  temperature: number;
+  windSpeed: number;
+};
+
+type OpenMeteoResponse = {
+  current?: {
+    time?: string;
+    cloud_cover?: number;
+    precipitation?: number;
+    temperature_2m?: number;
+    wind_speed_10m?: number;
+  };
+};
+
+const scenarioWeather: Record<Scenario, WeatherValues> = {
+  normal: { cloudCover: 18, rain: false, temperature: 25, windSpeed: 2.1 },
+  cloudy: { cloudCover: 82, rain: false, temperature: 24, windSpeed: 3.2 },
+  shade: { cloudCover: 24, rain: false, temperature: 27, windSpeed: 2.4 },
+  soiling: { cloudCover: 20, rain: false, temperature: 26, windSpeed: 2.0 },
+  overheat: { cloudCover: 12, rain: false, temperature: 36, windSpeed: 1.8 },
+  charging_issue: { cloudCover: 22, rain: false, temperature: 25, windSpeed: 2.2 },
+  overload: { cloudCover: 18, rain: false, temperature: 25, windSpeed: 2.1 },
+};
+
+export function calculateWeather(
+  scenario: Scenario,
+  location: WeatherLocation = defaultWeatherLocation,
+  source: WeatherSource = "scenario",
+): WeatherState {
+  return buildWeatherState({
+    values: scenarioWeather[scenario],
+    scenario,
+    location,
+    source,
+    collectedAt: "시나리오 기준",
+  });
+}
+
+export async function fetchLocationWeather(
+  location: WeatherLocation,
+  scenario: Scenario,
+): Promise<WeatherState> {
+  const query = new URLSearchParams({
+    latitude: String(location.latitude),
+    longitude: String(location.longitude),
+    current: "temperature_2m,precipitation,cloud_cover,wind_speed_10m",
+    timezone: "Asia/Seoul",
+  });
+
+  try {
+    const response = await fetch(`https://api.open-meteo.com/v1/forecast?${query.toString()}`);
+    if (!response.ok) {
+      throw new Error(`weather api ${response.status}`);
+    }
+
+    const data = (await response.json()) as OpenMeteoResponse;
+    if (!data.current) {
+      throw new Error("weather api missing current data");
+    }
+
+    return buildWeatherState({
+      values: {
+        cloudCover: clampWeather(data.current.cloud_cover ?? scenarioWeather[scenario].cloudCover, 0, 100),
+        rain: (data.current.precipitation ?? 0) > 0.2,
+        temperature: data.current.temperature_2m ?? scenarioWeather[scenario].temperature,
+        windSpeed: data.current.wind_speed_10m ?? scenarioWeather[scenario].windSpeed,
+      },
+      scenario,
+      location,
+      source: "open-meteo",
+      collectedAt: data.current.time ?? new Date().toISOString(),
+    });
+  } catch {
+    return buildWeatherState({
+      values: scenarioWeather[scenario],
+      scenario,
+      location,
+      source: "fallback",
+      collectedAt: "수집 실패",
+    });
   }
+}
+
+function buildWeatherState({
+  values,
+  scenario,
+  location,
+  source,
+  collectedAt,
+}: {
+  values: WeatherValues;
+  scenario: Scenario;
+  location: WeatherLocation;
+  source: WeatherSource;
+  collectedAt: string;
+}): WeatherState {
+  const adjustedValues = applyScenarioWeather(values, scenario);
+  const trackingLimited =
+    adjustedValues.rain || adjustedValues.cloudCover >= 75 || adjustedValues.windSpeed >= 10;
+
+  return {
+    label: getWeatherLabel(adjustedValues),
+    cloudCover: Math.round(adjustedValues.cloudCover),
+    rain: adjustedValues.rain,
+    temperature: Number(adjustedValues.temperature.toFixed(1)),
+    windSpeed: Number(adjustedValues.windSpeed.toFixed(1)),
+    trackingLimited,
+    reason: getWeatherReason(adjustedValues, trackingLimited),
+    locationName: location.name,
+    source,
+    collectedAt,
+    agentNote: getAgentNote(source, location, scenario, trackingLimited),
+  };
+}
+
+function applyScenarioWeather(values: WeatherValues, scenario: Scenario): WeatherValues {
+  if (scenario === "cloudy") {
+    return { ...values, cloudCover: Math.max(values.cloudCover, 82) };
+  }
+
+  if (scenario === "overheat") {
+    return { ...values, temperature: Math.max(values.temperature, 36), windSpeed: Math.min(values.windSpeed, 2.4) };
+  }
+
+  return values;
+}
+
+function getWeatherLabel(values: WeatherValues) {
+  if (values.rain) return "비";
+  if (values.cloudCover >= 75) return "흐림";
+  if (values.temperature >= 34) return "고온";
+  if (values.cloudCover >= 45) return "구름 많음";
+  return "맑음";
+}
+
+function getWeatherReason(values: WeatherValues, trackingLimited: boolean) {
+  if (values.rain) return "강수가 감지되어 발전량 저하와 장비 보호 판단이 필요합니다.";
+  if (values.windSpeed >= 10) return "풍속이 높아 패널 각도 변경을 보수적으로 판단합니다.";
+  if (values.cloudCover >= 75) return "구름량이 높아 일시적인 출력 저하 가능성이 큽니다.";
+  if (values.temperature >= 34) return "기온이 높아 패널 온도 상승과 효율 저하를 함께 확인합니다.";
+  if (trackingLimited) return "기상 조건이 추적 보류 기준에 가깝습니다.";
+  return "추적 동작이 가능한 안정적인 기상 조건입니다.";
+}
+
+function getAgentNote(
+  source: WeatherSource,
+  location: WeatherLocation,
+  scenario: Scenario,
+  trackingLimited: boolean,
+) {
+  const sourceText =
+    source === "open-meteo"
+      ? "Open-Meteo 현재 기상"
+      : source === "fallback"
+        ? "수집 실패 후 시나리오 대체값"
+        : "시나리오 기준값";
+  const decision = trackingLimited ? "모터 보정을 보류 후보로 표시합니다." : "추적 보정을 계속 허용합니다.";
+  const scenarioText = scenario === "cloudy" || scenario === "overheat" ? " 시나리오 조건을 함께 반영했습니다." : "";
+
+  return `${location.name} 위치의 ${sourceText}을 Agent 판단 보조 데이터로 사용합니다. ${decision}${scenarioText}`;
+}
+
+function clampWeather(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
 }

@@ -9,6 +9,16 @@ export type Scenario =
 
 export type RiskLevel = "normal" | "warning" | "danger";
 
+export type WeatherSource = "scenario" | "open-meteo" | "fallback";
+
+export type WeatherLocation = {
+  id: string;
+  name: string;
+  latitude: number;
+  longitude: number;
+  note: string;
+};
+
 export type AgentPhase =
   | "idle"
   | "weather_check"
@@ -26,6 +36,10 @@ export type WeatherState = {
   windSpeed: number;
   trackingLimited: boolean;
   reason: string;
+  locationName: string;
+  source: WeatherSource;
+  collectedAt: string;
+  agentNote: string;
 };
 
 export type VisionState = {
@@ -76,6 +90,7 @@ export type SolarState = {
   panelTemp: number;
   batteryVoltage: number;
   scenario: Scenario;
+  weatherLocationId: string;
   phase: AgentPhase;
   phaseReason: string;
   diagnosis: string;

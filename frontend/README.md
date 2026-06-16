@@ -1,5 +1,12 @@
 # frontend
 
-React 단독 시뮬레이터가 들어갈 영역이다.
+SolarTrack Agent의 React 단독 시뮬레이터다.
 
-초기 단계에서는 구현하지 않고, `docs/v01_react_simulator_plan.md` 이후에 Vite + React + TypeScript로 생성한다.
+## 실행
+
+```powershell
+npm install
+npm run dev
+```
+
+기본 주소는 `http://127.0.0.1:5173`이다.

@@ -9,6 +9,15 @@ wheels/
 # Virtual environments
 .venv
 
+# Frontend dependencies and generated files
+node_modules/
+dist/
+frontend/node_modules/
+frontend/dist/
+frontend/vite.log
+frontend/*.png
+.chrome-v01/
+
 # Local Codex project rules
 SKILL.md
 UPDATE.md

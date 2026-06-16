@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AgentPanel } from "./components/AgentPanel";
 import { ControlPanel } from "./components/ControlPanel";
+import { DashboardPanel } from "./components/DashboardPanel";
 import { LogPanel } from "./components/LogPanel";
 import { ModelPanel } from "./components/ModelPanel";
 import { PowerChart } from "./components/PowerChart";
@@ -251,7 +252,7 @@ function App() {
     <main className="app-shell">
       <header className="topbar">
         <div>
-          <p className="eyebrow">v05 위치 기상 Agent</p>
+          <p className="eyebrow">v06 대시보드 UI</p>
           <h1>SolarTrack Agent</h1>
         </div>
         <div className="status-strip">
@@ -260,6 +261,8 @@ function App() {
           <span>{formatTime(state.time)}</span>
         </div>
       </header>
+
+      <DashboardPanel state={state} />
 
       <div className="workspace">
         <div className="main-column">

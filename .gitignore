@@ -14,7 +14,7 @@ node_modules/
 dist/
 frontend/node_modules/
 frontend/dist/
-frontend/vite.log
+frontend/vite*.log
 frontend/*.png
 .chrome-v01/
 

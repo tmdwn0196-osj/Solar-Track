@@ -65,6 +65,12 @@ export type DiagnosisResult = {
   diagnosisReasons: string[];
 };
 
+export type SolarHistoryPoint = {
+  time: number;
+  fixedPower: number;
+  trackedPower: number;
+};
+
 export type SolarState = {
   time: number;
   running: boolean;
@@ -99,6 +105,6 @@ export type SolarState = {
   diagnosisReasons: string[];
   weather: WeatherState;
   vision: VisionState;
-  history: { time: number; fixedPower: number; trackedPower: number }[];
+  history: SolarHistoryPoint[];
   logs: string[];
 };

@@ -1,9 +1,11 @@
 import { LineChart } from "lucide-react";
+import { calculateEnergySummary } from "../logic/energyModel";
 import type { SolarState } from "../types/solar";
 import { Metric } from "./Metric";
 
 export function PowerChart({ state }: { state: SolarState }) {
   const points = state.history.slice(-30);
+  const energy = calculateEnergySummary(state.history);
   const maxPower = Math.max(10, ...points.flatMap((point) => [point.fixedPower, point.trackedPower]));
   const chartWidth = 360;
   const chartHeight = 140;
@@ -39,6 +41,11 @@ export function PowerChart({ state }: { state: SolarState }) {
       <div className="legend">
         <span><i className="fixed-dot" />고정식</span>
         <span><i className="tracked-dot" />추적식</span>
+      </div>
+      <div className="energy-summary">
+        <span>누적 고정식 {energy.fixedWh.toFixed(2)} Wh</span>
+        <span>누적 추적식 {energy.trackedWh.toFixed(2)} Wh</span>
+        <span>누적 개선률 {energy.gainRate.toFixed(1)}%</span>
       </div>
     </section>
   );

@@ -9,6 +9,7 @@ SolarTrack Agent의 React 단독 시뮬레이터다.
 - 고정식 대비 추적식 발전량 비교
 - 발전량 계산 계수 표시
 - 기상, Vision, Agent 상태 패널
+- 진단 근거와 위험도 표시
 
 ## 실행
 

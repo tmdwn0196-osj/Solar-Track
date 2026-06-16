@@ -11,12 +11,19 @@ const phaseLabels: Record<SolarState["phase"], string> = {
   diagnosis: "진단",
 };
 
+const riskLabels: Record<SolarState["riskLevel"], string> = {
+  normal: "정상",
+  warning: "주의",
+  danger: "위험",
+};
+
 export function AgentPanel({ state }: { state: SolarState }) {
   return (
     <section className={`panel agent-panel risk-${state.riskLevel}`}>
       <div className="panel-heading">
         <Bot size={18} />
         <h2>Agent</h2>
+        <span className={`risk-badge risk-badge-${state.riskLevel}`}>{riskLabels[state.riskLevel]}</span>
       </div>
       <dl className="agent-list">
         <div>
@@ -36,6 +43,16 @@ export function AgentPanel({ state }: { state: SolarState }) {
         <div>
           <dt>진단</dt>
           <dd>{state.diagnosis}</dd>
+        </div>
+        <div>
+          <dt>진단 근거</dt>
+          <dd>
+            <ul className="reason-list">
+              {state.diagnosisReasons.map((reason) => (
+                <li key={reason}>{reason}</li>
+              ))}
+            </ul>
+          </dd>
         </div>
         <div>
           <dt>조치</dt>

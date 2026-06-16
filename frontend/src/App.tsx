@@ -38,6 +38,7 @@ function createInitialState(): SolarState {
     rightLight: 0,
     topLight: 0,
     bottomLight: 0,
+    lightAverage: 0,
     voltage: 0,
     current: 0,
     power: 0,
@@ -60,6 +61,7 @@ function createInitialState(): SolarState {
     diagnosis: "시뮬레이션 대기",
     action: "시작 버튼을 눌러 태양 추적 흐름을 확인하세요.",
     riskLevel: "normal",
+    diagnosisReasons: ["아직 추적 루프가 실행되지 않았습니다."],
     weather,
     vision,
     history: [],
@@ -203,7 +205,7 @@ function App() {
     <main className="app-shell">
       <header className="topbar">
         <div>
-          <p className="eyebrow">v03 순차제어 Agent</p>
+          <p className="eyebrow">v04 진단 Agent</p>
           <h1>SolarTrack Agent</h1>
         </div>
         <div className="status-strip">

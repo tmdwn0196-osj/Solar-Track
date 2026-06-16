@@ -20,10 +20,16 @@ export function calculateVirtualSensors(input: SensorInput) {
   const elevationDiff = input.sunElevation - input.panelElevation;
   const baseLight = getLightFactor(input.scenario);
 
+  const leftLight = Number((baseLight + Math.max(0, -azimuthDiff) / 100).toFixed(2));
+  const rightLight = Number((baseLight + Math.max(0, azimuthDiff) / 100).toFixed(2));
+  const topLight = Number((baseLight + Math.max(0, elevationDiff) / 100).toFixed(2));
+  const bottomLight = Number((baseLight + Math.max(0, -elevationDiff) / 100).toFixed(2));
+
   return {
-    leftLight: Number((baseLight + Math.max(0, -azimuthDiff) / 100).toFixed(2)),
-    rightLight: Number((baseLight + Math.max(0, azimuthDiff) / 100).toFixed(2)),
-    topLight: Number((baseLight + Math.max(0, elevationDiff) / 100).toFixed(2)),
-    bottomLight: Number((baseLight + Math.max(0, -elevationDiff) / 100).toFixed(2)),
+    leftLight,
+    rightLight,
+    topLight,
+    bottomLight,
+    lightAverage: Number(((leftLight + rightLight + topLight + bottomLight) / 4).toFixed(2)),
   };
 }

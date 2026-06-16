@@ -130,6 +130,10 @@ h2 {
   color: #244d45;
 }
 
+.panel-heading h2 {
+  margin-right: auto;
+}
+
 .scene-panel {
   padding: 0;
   overflow: hidden;
@@ -417,6 +421,30 @@ select {
 .agent-list dd {
   margin: 0;
   line-height: 1.45;
+}
+
+.reason-list {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+}
+
+.risk-badge {
+  min-height: 26px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  color: #17211d;
+  background: #e8eeea;
+}
+
+.risk-badge-warning {
+  background: #fff0c8;
+}
+
+.risk-badge-danger {
+  background: #ffe0dc;
 }
 
 .risk-warning {

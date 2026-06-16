@@ -44,6 +44,13 @@ export type PowerBreakdown = {
   weatherFactor: number;
 };
 
+export type DiagnosisResult = {
+  diagnosis: string;
+  action: string;
+  riskLevel: RiskLevel;
+  diagnosisReasons: string[];
+};
+
 export type SolarState = {
   time: number;
   running: boolean;
@@ -58,6 +65,7 @@ export type SolarState = {
   rightLight: number;
   topLight: number;
   bottomLight: number;
+  lightAverage: number;
   voltage: number;
   current: number;
   power: number;
@@ -73,6 +81,7 @@ export type SolarState = {
   diagnosis: string;
   action: string;
   riskLevel: RiskLevel;
+  diagnosisReasons: string[];
   weather: WeatherState;
   vision: VisionState;
   history: { time: number; fixedPower: number; trackedPower: number }[];

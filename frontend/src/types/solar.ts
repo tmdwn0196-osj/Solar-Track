@@ -10,6 +10,7 @@ export type Scenario =
 export type RiskLevel = "normal" | "warning" | "danger";
 
 export type WeatherSource = "scenario" | "kma-kim" | "fallback";
+export type WeatherMode = "scenario" | "kma-kim";
 
 export type WeatherLocation = {
   id: string;
@@ -104,6 +105,7 @@ export type SolarState = {
   batteryVoltage: number;
   scenario: Scenario;
   weatherLocationId: string;
+  weatherMode: WeatherMode;
   phase: AgentPhase;
   phaseReason: string;
   diagnosis: string;

@@ -15,10 +15,13 @@ Scenario = Literal[
     "overload",
 ]
 
+WeatherMode = Literal["scenario", "kma-kim"]
+
 
 class WeatherContextRequest(BaseModel):
     scenario: Scenario
     locationId: str = Field(default="seoul")
+    mode: WeatherMode = Field(default="kma-kim")
 
 
 class VisionInferRequest(BaseModel):

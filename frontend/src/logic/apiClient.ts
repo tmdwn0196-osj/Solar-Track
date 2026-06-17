@@ -1,4 +1,4 @@
-import type { Scenario, SolarState, WeatherState } from "../types/solar";
+import type { Scenario, SolarState, WeatherMode, WeatherState } from "../types/solar";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000";
 const REQUEST_TIMEOUT_MS = 2500;
@@ -19,10 +19,12 @@ export async function requestSimulationStep(state: SolarState): Promise<SolarSta
 export async function requestWeatherContext(
   scenario: Scenario,
   locationId: string,
+  mode: WeatherMode,
 ): Promise<WeatherState> {
   const data = await postJson<WeatherContextResponse>("/api/weather/context", {
     scenario,
     locationId,
+    mode,
   });
   return data.weather;
 }

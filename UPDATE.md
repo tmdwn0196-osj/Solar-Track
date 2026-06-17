@@ -1,4 +1,10 @@
-﻿## 2026-06-17 12:08 KST - 프론트 표시 문구 한글화
+﻿## 2026-06-17 17:48 KST - 기상 모드 선택 추가
+
+- Changed: `UPDATE.md`, `backend/app.py`, `backend/models.py`, `frontend/src/App.tsx`, `frontend/src/components/ControlPanel.tsx`, `frontend/src/logic/apiClient.ts`, `frontend/src/types/solar.ts`
+- Actions: 기상 컨텍스트를 `시나리오 기반` 모드와 `기상청 KIM` 모드로 명시적으로 분리했다. 프론트 제어 패널에 기상 모드 선택 UI를 추가하고, 백엔드 `/api/weather/context`가 `mode=scenario`이면 외부 API 없이 시나리오 기상값을 반환하고 `mode=kma-kim`이면 KIM API 값을 우선 반영하도록 변경했다.
+- Validation: `npm run build` passed; `uv run python -m py_compile main.py backend\__init__.py backend\app.py backend\models.py backend\simulation.py backend\agent_graph.py backend\vision_dataset.py backend\hardware_gateway.py backend\demo_report.py backend\kma_kim_weather.py` passed; FastAPI TestClient calls for `/api/weather/context` returned `mode=scenario -> source=scenario, temperature=25` and `mode=kma-kim -> source=kma-kim, temperature=17.2, collectedAt=2026061700`; frontend/backend source search found no mojibake patterns.
+
+## 2026-06-17 12:08 KST - 프론트 표시 문구 한글화
 
 - Changed: `UPDATE.md`, `backend/demo_report.py`, `backend/kma_kim_weather.py`, `backend/simulation.py`, `backend/vision_dataset.py`, `frontend/src/App.tsx`, `frontend/src/components/AgentPanel.tsx`, `frontend/src/components/ControlPanel.tsx`, `frontend/src/components/DashboardPanel.tsx`, `frontend/src/components/DemoReportPanel.tsx`, `frontend/src/components/LogPanel.tsx`, `frontend/src/components/ModelPanel.tsx`, `frontend/src/components/PowerChart.tsx`, `frontend/src/components/SensorPanel.tsx`, `frontend/src/components/SolarScene.tsx`, `frontend/src/components/VisionPanel.tsx`, `frontend/src/components/WeatherPanel.tsx`, `frontend/src/data/scenarios.ts`, `frontend/src/logic/reportModel.ts`, `frontend/src/logic/trackingAgent.ts`, `frontend/src/logic/visionModel.ts`, `frontend/src/logic/weatherModel.ts`
 - Actions: 프론트에 표시되는 깨진 한글, 영어 상태 문구, `Fallback`, `Agent`, `Class` 표기를 한글 문장으로 정리했다. 백엔드에서 프론트로 내려오는 기상, 시뮬레이션, 비전 데이터셋, 리포트 문구도 한글 응답으로 맞췄다.

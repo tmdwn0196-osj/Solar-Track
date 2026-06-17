@@ -15,7 +15,7 @@ from backend.models import (
     VisionInferRequest,
     WeatherContextRequest,
 )
-from backend.simulation import diagnose_state, infer_vision, recalculate_state, run_tracking_step, simulate_step
+from backend.simulation import calculate_weather, diagnose_state, infer_vision, recalculate_state, run_tracking_step, simulate_step
 from backend.vision_dataset import get_vision_dataset_summary
 
 
@@ -47,6 +47,15 @@ def simulate_step_endpoint(request: StateRequest) -> dict[str, object]:
 
 @app.post("/api/weather/context")
 def weather_context(request: WeatherContextRequest) -> dict[str, object]:
+    if request.mode == "scenario":
+        return {
+            "weather": calculate_weather(
+                scenario=request.scenario,
+                location_id=request.locationId,
+                source="scenario",
+            )
+        }
+
     return {
         "weather": fetch_kma_kim_weather(
             scenario=request.scenario,

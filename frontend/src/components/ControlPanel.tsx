@@ -1,18 +1,20 @@
 import { Minus, Pause, Play, Plus, RotateCcw, SlidersHorizontal } from "lucide-react";
 import { scenarios } from "../data/scenarios";
 import { weatherLocations } from "../data/weatherLocations";
-import type { Scenario } from "../types/solar";
+import type { Scenario, WeatherMode } from "../types/solar";
 
 type ControlPanelProps = {
   running: boolean;
   autoTracking: boolean;
   scenario: Scenario;
   weatherLocationId: string;
+  weatherMode: WeatherMode;
   onStart: () => void;
   onPause: () => void;
   onReset: () => void;
   onScenarioChange: (scenario: Scenario) => void;
   onWeatherLocationChange: (locationId: string) => void;
+  onWeatherModeChange: (mode: WeatherMode) => void;
   onAutoTrackingChange: (enabled: boolean) => void;
   onManualAdjust: (field: "azimuth" | "elevation", amount: number) => void;
 };
@@ -22,11 +24,13 @@ export function ControlPanel({
   autoTracking,
   scenario,
   weatherLocationId,
+  weatherMode,
   onStart,
   onPause,
   onReset,
   onScenarioChange,
   onWeatherLocationChange,
+  onWeatherModeChange,
   onAutoTrackingChange,
   onManualAdjust,
 }: ControlPanelProps) {
@@ -79,6 +83,19 @@ export function ControlPanel({
           ))}
         </select>
         <p>{weatherLocations.find((location) => location.id === weatherLocationId)?.note}</p>
+      </div>
+
+      <div className="control-group">
+        <span>기상 모드</span>
+        <select value={weatherMode} onChange={(event) => onWeatherModeChange(event.target.value as WeatherMode)}>
+          <option value="kma-kim">기상청 KIM</option>
+          <option value="scenario">시나리오 기반</option>
+        </select>
+        <p>
+          {weatherMode === "kma-kim"
+            ? "KIM 예측 온도를 우선 반영하고, 미연동 변수는 시나리오 값을 함께 사용합니다."
+            : "외부 기상 API 없이 선택한 시나리오의 고정 기상값만 사용합니다."}
+        </p>
       </div>
 
       <div className="manual-grid">

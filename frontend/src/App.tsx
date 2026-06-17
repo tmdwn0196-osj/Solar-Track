@@ -20,9 +20,10 @@ import { calculateAngleErrors, clamp, runTrackingStep } from "./logic/trackingAg
 import { inferVirtualVision } from "./logic/visionModel";
 import { calculateWeather } from "./logic/weatherModel";
 import { requestSimulationStep, requestWeatherContext } from "./logic/apiClient";
-import type { Scenario, SolarState } from "./types/solar";
+import type { Scenario, SolarState, WeatherMode } from "./types/solar";
 
 const initialScenario: Scenario = "normal";
+const initialWeatherMode: WeatherMode = "kma-kim";
 
 function createInitialState(): SolarState {
   const weather = calculateWeather(initialScenario, defaultWeatherLocation);
@@ -61,6 +62,7 @@ function createInitialState(): SolarState {
     batteryVoltage: 12.1,
     scenario: initialScenario,
     weatherLocationId: defaultWeatherLocation.id,
+    weatherMode: initialWeatherMode,
     phase: "idle",
     phaseReason: "시뮬레이션 시작 전입니다.",
     diagnosis: "시뮬레이션 대기",
@@ -157,24 +159,35 @@ function App() {
 
   useEffect(() => {
     const location = findWeatherLocation(state.weatherLocationId);
+    const weatherMode = state.weatherMode;
     let cancelled = false;
 
     setState((previous) =>
       recalculateState({
         ...previous,
-        weather: calculateWeather(previous.scenario, location),
-        logs: appendLog(previous.logs, `${formatTime(previous.time)} ${location.name} 기상 수집을 시작했습니다.`),
+        weather: calculateWeather(previous.scenario, location, weatherMode === "scenario" ? "scenario" : "fallback"),
+        logs: appendLog(
+          previous.logs,
+          `${formatTime(previous.time)} ${location.name} ${weatherMode === "kma-kim" ? "기상청 KIM" : "시나리오 기반"} 기상 수집을 시작했습니다.`,
+        ),
       }),
     );
 
     async function syncWeather() {
-      const weather = await requestWeatherContext(state.scenario, location.id).catch(() =>
-        calculateWeather(state.scenario, location, "fallback"),
-      );
+      const weather =
+        weatherMode === "scenario"
+          ? calculateWeather(state.scenario, location)
+          : await requestWeatherContext(state.scenario, location.id, weatherMode).catch(() =>
+              calculateWeather(state.scenario, location, "fallback"),
+            );
       if (cancelled) return;
 
       setState((previous) => {
-        if (previous.weatherLocationId !== location.id || previous.scenario !== state.scenario) {
+        if (
+          previous.weatherLocationId !== location.id ||
+          previous.scenario !== state.scenario ||
+          previous.weatherMode !== weatherMode
+        ) {
           return previous;
         }
 
@@ -191,7 +204,7 @@ function App() {
     return () => {
       cancelled = true;
     };
-  }, [state.weatherLocationId, state.scenario]);
+  }, [state.weatherLocationId, state.scenario, state.weatherMode]);
 
   useEffect(() => {
     if (!state.running) return;
@@ -260,6 +273,20 @@ function App() {
     );
   }
 
+  function updateWeatherMode(weatherMode: WeatherMode) {
+    setState((previous) =>
+      recalculateState({
+        ...previous,
+        weatherMode,
+        phase: "weather_check",
+        logs: appendLog(
+          previous.logs,
+          `${formatTime(previous.time)} 기상 모드를 ${weatherMode === "kma-kim" ? "기상청 KIM" : "시나리오 기반"}으로 변경했습니다.`,
+        ),
+      }),
+    );
+  }
+
   function adjustPanel(field: "azimuth" | "elevation", amount: number) {
     setState((previous) =>
       recalculateState({
@@ -301,11 +328,13 @@ function App() {
             autoTracking={state.autoTracking}
             scenario={state.scenario}
             weatherLocationId={state.weatherLocationId}
+            weatherMode={state.weatherMode}
             onStart={() => setState((previous) => ({ ...previous, running: true }))}
             onPause={() => setState((previous) => ({ ...previous, running: false }))}
             onReset={() => setState(createInitialState())}
             onScenarioChange={updateScenario}
             onWeatherLocationChange={updateWeatherLocation}
+            onWeatherModeChange={updateWeatherMode}
             onAutoTrackingChange={(enabled) =>
               setState((previous) => ({ ...previous, autoTracking: enabled }))
             }

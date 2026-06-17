@@ -1,7 +1,13 @@
+﻿## 2026-06-17 11:23 KST - 기상 fallback 안내 문구 명시
+
+- Changed: `UPDATE.md`, `backend/kma_kim_weather.py`, `frontend/src/components/WeatherPanel.tsx`, `frontend/src/logic/weatherModel.ts`, `frontend/src/styles.css`
+- Actions: 기상청 KIM 데이터를 사용할 수 없어 fallback으로 전환될 때 API 응답의 `reason`, `collectedAt`, `agentNote`와 프론트엔드 기상 패널에 fallback 데이터를 사용한다는 문구가 명확히 표시되도록 보강했다. 런타임과 문서에서 특정 외부 기상 서비스 직접 사용 표현을 제거했다.
+- Validation: deprecated external weather service references were removed; `uv run python -m py_compile main.py backend\__init__.py backend\app.py backend\models.py backend\simulation.py backend\agent_graph.py backend\vision_dataset.py backend\hardware_gateway.py backend\demo_report.py backend\kma_kim_weather.py` passed; `npm run build` passed; `uv run python main.py` printed `Hello from solar-track!`; FastAPI TestClient call for `/api/weather/context` returned `source=fallback`, `collectedAt=fallback 데이터 사용`, and explicit fallback message; temporary `uvicorn` server returned `/api/health` successfully.
+
 ## 2026-06-17 11:21 KST - 기상청 KIM 기상 API 연동
 
 - Changed: `.gitignore`, `.env.example`, `README.md`, `UPDATE.md`, `backend/app.py`, `backend/kma_kim_weather.py`, `backend/README.md`, `docs/v07_fastapi_backend_plan.md`, `frontend/README.md`, `frontend/src/App.tsx`, `frontend/src/components/WeatherPanel.tsx`, `frontend/src/logic/weatherModel.ts`, `frontend/src/types/solar.ts`
-- Actions: 백엔드 `/api/weather/context`를 기상청 API 허브 한국형수치예보모델(KIM) 자료 조회 우선 구조로 변경했다. 인증키는 `KMA_APIHUB_AUTH_KEY` 환경변수로만 읽고, 인증키 미설정 또는 KIM 응답 실패 시 시나리오 기상값으로 fallback하도록 처리했다. 프론트엔드 직접 Open-Meteo 호출 경로를 제거하고 기상 출처에 `kma-kim`을 추가했다.
+- Actions: 백엔드 `/api/weather/context`를 기상청 API 허브 한국형수치예보모델(KIM) 자료 조회 우선 구조로 변경했다. 인증키는 `KMA_APIHUB_AUTH_KEY` 환경변수로만 읽고, 인증키 미설정 또는 KIM 응답 실패 시 시나리오 기상값으로 fallback하도록 처리했다. 프론트엔드 직접 외부 기상 호출 경로를 제거하고 기상 출처에 `kma-kim`을 추가했다.
 - Validation: `uv run python -m py_compile main.py backend\__init__.py backend\app.py backend\models.py backend\simulation.py backend\agent_graph.py backend\vision_dataset.py backend\hardware_gateway.py backend\demo_report.py backend\kma_kim_weather.py` passed; `npm run build` passed; `uv run python main.py` printed `Hello from solar-track!`; FastAPI TestClient calls for `/api/health` and `/api/weather/context` without `KMA_APIHUB_AUTH_KEY` returned fallback successfully; temporary `uvicorn` server returned `/api/health` successfully.
 
 ## 2026-06-17 10:29 KST - v11 시연 리포트 구성
@@ -43,7 +49,7 @@
 ## 2026-06-16 15:39 KST - v05 위치 기상 Agent 구현
 
 - Changed: `frontend/README.md`, `frontend/src/App.tsx`, `frontend/src/types/solar.ts`, `frontend/src/data/weatherLocations.ts`, `frontend/src/logic/weatherModel.ts`, `frontend/src/components/ControlPanel.tsx`, `frontend/src/components/WeatherPanel.tsx`, `frontend/src/styles.css`
-- Actions: 서울/부산/제주/대전 위치 선택을 추가하고 Open-Meteo 현재 기상 수집 결과를 Agent 판단 보조 데이터와 발전량 기상 계수에 반영함. 수집 실패 시 시나리오 기반 대체값을 사용하도록 처리함
+- Actions: 서울/부산/제주/대전 위치 선택을 추가하고 외부 기상 API 결과 수집 결과를 Agent 판단 보조 데이터와 발전량 기상 계수에 반영함. 수집 실패 시 시나리오 기반 대체값을 사용하도록 처리함
 - Validation: `npm run build` passed; `npm audit --audit-level=high` found 0 vulnerabilities; `uv run python -m py_compile main.py` passed; `uv run python main.py` printed `Hello from solar-track!`; Chrome headless desktop/mobile screenshot and DOM render verified
 
 ## 2026-06-16 15:29 KST - v04 진단 Agent 근거 표시
@@ -78,7 +84,7 @@
 ## 2026-06-16 15:39 KST - v05 위치 기상 Agent 구현
 
 - Changed: `frontend/README.md`, `frontend/src/App.tsx`, `frontend/src/types/solar.ts`, `frontend/src/data/weatherLocations.ts`, `frontend/src/logic/weatherModel.ts`, `frontend/src/components/ControlPanel.tsx`, `frontend/src/components/WeatherPanel.tsx`, `frontend/src/styles.css`
-- Actions: 서울/부산/제주/대전 위치 선택을 추가하고 Open-Meteo 현재 기상 수집 결과를 Agent 판단 보조 데이터와 발전량 기상 계수에 반영함. 수집 실패 시 시나리오 기반 대체값을 사용하도록 처리함
+- Actions: 서울/부산/제주/대전 위치 선택을 추가하고 외부 기상 API 결과 수집 결과를 Agent 판단 보조 데이터와 발전량 기상 계수에 반영함. 수집 실패 시 시나리오 기반 대체값을 사용하도록 처리함
 - Validation: `npm run build` passed; `npm audit --audit-level=high` found 0 vulnerabilities; `uv run python -m py_compile main.py` passed; `uv run python main.py` printed `Hello from solar-track!`; Chrome headless desktop/mobile screenshot and DOM render verified
 
 ## 2026-06-16 15:29 KST - v04 진단 Agent 근거 표시

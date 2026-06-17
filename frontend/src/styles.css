@@ -295,6 +295,11 @@ select {
   margin-top: 8px;
 }
 
+.warning-note {
+  color: #8a5a00;
+  font-weight: 650;
+}
+
 .formula {
   margin-bottom: 12px;
 }

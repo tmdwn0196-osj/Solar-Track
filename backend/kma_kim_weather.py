@@ -21,7 +21,7 @@ def fetch_kma_kim_weather(scenario: str, location_id: str) -> dict[str, Any]:
         return with_fallback_note(
             scenario,
             location_id,
-            "KMA_APIHUB_AUTH_KEY is not set. Using scenario weather fallback.",
+            "KMA_APIHUB_AUTH_KEY is not set. Fallback weather data is being used.",
         )
 
     try:
@@ -41,7 +41,7 @@ def fetch_kma_kim_weather(scenario: str, location_id: str) -> dict[str, Any]:
         return with_fallback_note(
             scenario,
             location_id,
-            f"KMA KIM request failed: {exc}. Using scenario weather fallback.",
+            f"KMA KIM request failed: {exc}. Fallback weather data is being used.",
         )
 
 
@@ -104,6 +104,8 @@ def with_fallback_note(scenario: str, location_id: str, note: str) -> dict[str, 
     weather = calculate_weather(scenario, location_id, source="fallback")
     return {
         **weather,
+        "reason": f"{weather['reason']} KMA KIM 데이터를 사용할 수 없어 fallback 데이터를 사용합니다.",
+        "collectedAt": "fallback 데이터 사용",
         "agentNote": f"{weather['locationName']} KMA KIM fallback: {note}",
     }
 

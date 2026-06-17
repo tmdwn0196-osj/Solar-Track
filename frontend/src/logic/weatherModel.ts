@@ -28,7 +28,7 @@ export function calculateWeather(
     scenario,
     location,
     source,
-    collectedAt: "시나리오 기준",
+    collectedAt: source === "fallback" ? "fallback 데이터 사용" : "시나리오 기준",
   });
 }
 
@@ -103,10 +103,11 @@ function getAgentNote(
     source === "kma-kim"
       ? "기상청 API 허브 KIM 예측"
       : source === "fallback"
-        ? "수집 실패 후 시나리오 대체값"
+        ? "fallback 데이터"
         : "시나리오 기준값";
   const decision = trackingLimited ? "모터 보정을 보류 후보로 표시합니다." : "추적 보정을 계속 허용합니다.";
   const scenarioText = scenario === "cloudy" || scenario === "overheat" ? " 시나리오 조건을 함께 반영했습니다." : "";
+  const fallbackText = source === "fallback" ? " 기상청 KIM 데이터를 사용할 수 없어 fallback 데이터를 사용합니다." : "";
 
-  return `${location.name} 위치의 ${sourceText}을 Agent 판단 보조 데이터로 사용합니다. ${decision}${scenarioText}`;
+  return `${location.name} 위치의 ${sourceText}을 Agent 판단 보조 데이터로 사용합니다.${fallbackText} ${decision}${scenarioText}`;
 }

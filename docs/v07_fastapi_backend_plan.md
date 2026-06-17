@@ -27,6 +27,8 @@ React 단독 구현으로 흐름을 검증한 뒤, 계산과 진단을 백엔드
 
 초기에는 가상 기상 값을 반환한다. 이후 외부 날씨 API를 연결할 수 있도록 `location`, `timestamp`, `cloudCover`, `rain`, `temperature`, `windSpeed` 필드를 둔다.
 
+현재 구현은 백엔드 `/api/weather/context`에서 기상청 API 허브의 한국형수치예보모델(KIM) 자료 조회를 우선 사용한다. 인증키는 `KMA_APIHUB_AUTH_KEY` 환경변수로만 주입하고 코드에 저장하지 않는다. 인증키가 없거나 KIM 응답 파싱에 실패하면 시나리오 기반 대체값을 반환한다.
+
 ## 6. 비전모델 API 연동
 
 초기에는 시나리오 기반 가상 결과를 반환하고, 이후 실제 모델 서버로 교체한다.

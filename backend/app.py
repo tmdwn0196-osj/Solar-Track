@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.agent_graph import run_agent_graph
 from backend.demo_report import build_demo_report, get_demo_scenarios
 from backend.hardware_gateway import evaluate_hardware_telemetry, get_hardware_profile
+from backend.kma_kim_weather import fetch_kma_kim_weather
 from backend.models import (
     ControlCommandRequest,
     DemoReportRequest,
@@ -14,11 +15,11 @@ from backend.models import (
     VisionInferRequest,
     WeatherContextRequest,
 )
-from backend.simulation import calculate_weather, diagnose_state, infer_vision, recalculate_state, run_tracking_step, simulate_step
+from backend.simulation import diagnose_state, infer_vision, recalculate_state, run_tracking_step, simulate_step
 from backend.vision_dataset import get_vision_dataset_summary
 
 
-app = FastAPI(title="SolarTrack Agent API", version="0.11.0")
+app = FastAPI(title="SolarTrack Agent API", version="0.11.1")
 
 app.add_middleware(
     CORSMiddleware,
@@ -36,7 +37,7 @@ app.add_middleware(
 
 @app.get("/api/health")
 def health() -> dict[str, str]:
-    return {"status": "ok", "service": "solartrack-backend", "version": "0.11.0"}
+    return {"status": "ok", "service": "solartrack-backend", "version": "0.11.1"}
 
 
 @app.post("/api/simulate/step")
@@ -47,7 +48,7 @@ def simulate_step_endpoint(request: StateRequest) -> dict[str, object]:
 @app.post("/api/weather/context")
 def weather_context(request: WeatherContextRequest) -> dict[str, object]:
     return {
-        "weather": calculate_weather(
+        "weather": fetch_kma_kim_weather(
             scenario=request.scenario,
             location_id=request.locationId,
         )

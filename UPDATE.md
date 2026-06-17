@@ -1,3 +1,9 @@
+## 2026-06-17 11:21 KST - 기상청 KIM 기상 API 연동
+
+- Changed: `.gitignore`, `.env.example`, `README.md`, `UPDATE.md`, `backend/app.py`, `backend/kma_kim_weather.py`, `backend/README.md`, `docs/v07_fastapi_backend_plan.md`, `frontend/README.md`, `frontend/src/App.tsx`, `frontend/src/components/WeatherPanel.tsx`, `frontend/src/logic/weatherModel.ts`, `frontend/src/types/solar.ts`
+- Actions: 백엔드 `/api/weather/context`를 기상청 API 허브 한국형수치예보모델(KIM) 자료 조회 우선 구조로 변경했다. 인증키는 `KMA_APIHUB_AUTH_KEY` 환경변수로만 읽고, 인증키 미설정 또는 KIM 응답 실패 시 시나리오 기상값으로 fallback하도록 처리했다. 프론트엔드 직접 Open-Meteo 호출 경로를 제거하고 기상 출처에 `kma-kim`을 추가했다.
+- Validation: `uv run python -m py_compile main.py backend\__init__.py backend\app.py backend\models.py backend\simulation.py backend\agent_graph.py backend\vision_dataset.py backend\hardware_gateway.py backend\demo_report.py backend\kma_kim_weather.py` passed; `npm run build` passed; `uv run python main.py` printed `Hello from solar-track!`; FastAPI TestClient calls for `/api/health` and `/api/weather/context` without `KMA_APIHUB_AUTH_KEY` returned fallback successfully; temporary `uvicorn` server returned `/api/health` successfully.
+
 ## 2026-06-17 10:29 KST - v11 시연 리포트 구성
 
 - Changed: `README.md`, `UPDATE.md`, `backend/app.py`, `backend/models.py`, `backend/demo_report.py`, `backend/README.md`, `docs/v11_demo_scenario_and_report.md`, `frontend/README.md`, `frontend/src/App.tsx`, `frontend/src/components/DemoReportPanel.tsx`, `frontend/src/logic/reportModel.ts`, `frontend/src/styles.css`

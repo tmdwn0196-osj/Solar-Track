@@ -18,7 +18,7 @@ import { calculateVirtualSensors } from "./logic/sensorModel";
 import { calculateSunPosition } from "./logic/sunModel";
 import { calculateAngleErrors, clamp, runTrackingStep } from "./logic/trackingAgent";
 import { inferVirtualVision } from "./logic/visionModel";
-import { calculateWeather, fetchLocationWeather } from "./logic/weatherModel";
+import { calculateWeather } from "./logic/weatherModel";
 import { requestSimulationStep, requestWeatherContext } from "./logic/apiClient";
 import type { Scenario, SolarState } from "./types/solar";
 
@@ -169,7 +169,7 @@ function App() {
 
     async function syncWeather() {
       const weather = await requestWeatherContext(state.scenario, location.id).catch(() =>
-        fetchLocationWeather(location, state.scenario),
+        calculateWeather(state.scenario, location, "fallback"),
       );
       if (cancelled) return;
 

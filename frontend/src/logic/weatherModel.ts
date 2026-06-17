@@ -8,16 +8,6 @@ type WeatherValues = {
   windSpeed: number;
 };
 
-type OpenMeteoResponse = {
-  current?: {
-    time?: string;
-    cloud_cover?: number;
-    precipitation?: number;
-    temperature_2m?: number;
-    wind_speed_10m?: number;
-  };
-};
-
 const scenarioWeather: Record<Scenario, WeatherValues> = {
   normal: { cloudCover: 18, rain: false, temperature: 25, windSpeed: 2.1 },
   cloudy: { cloudCover: 82, rain: false, temperature: 24, windSpeed: 3.2 },
@@ -40,51 +30,6 @@ export function calculateWeather(
     source,
     collectedAt: "시나리오 기준",
   });
-}
-
-export async function fetchLocationWeather(
-  location: WeatherLocation,
-  scenario: Scenario,
-): Promise<WeatherState> {
-  const query = new URLSearchParams({
-    latitude: String(location.latitude),
-    longitude: String(location.longitude),
-    current: "temperature_2m,precipitation,cloud_cover,wind_speed_10m",
-    timezone: "Asia/Seoul",
-  });
-
-  try {
-    const response = await fetch(`https://api.open-meteo.com/v1/forecast?${query.toString()}`);
-    if (!response.ok) {
-      throw new Error(`weather api ${response.status}`);
-    }
-
-    const data = (await response.json()) as OpenMeteoResponse;
-    if (!data.current) {
-      throw new Error("weather api missing current data");
-    }
-
-    return buildWeatherState({
-      values: {
-        cloudCover: clampWeather(data.current.cloud_cover ?? scenarioWeather[scenario].cloudCover, 0, 100),
-        rain: (data.current.precipitation ?? 0) > 0.2,
-        temperature: data.current.temperature_2m ?? scenarioWeather[scenario].temperature,
-        windSpeed: data.current.wind_speed_10m ?? scenarioWeather[scenario].windSpeed,
-      },
-      scenario,
-      location,
-      source: "open-meteo",
-      collectedAt: data.current.time ?? new Date().toISOString(),
-    });
-  } catch {
-    return buildWeatherState({
-      values: scenarioWeather[scenario],
-      scenario,
-      location,
-      source: "fallback",
-      collectedAt: "수집 실패",
-    });
-  }
 }
 
 function buildWeatherState({
@@ -155,8 +100,8 @@ function getAgentNote(
   trackingLimited: boolean,
 ) {
   const sourceText =
-    source === "open-meteo"
-      ? "Open-Meteo 현재 기상"
+    source === "kma-kim"
+      ? "기상청 API 허브 KIM 예측"
       : source === "fallback"
         ? "수집 실패 후 시나리오 대체값"
         : "시나리오 기준값";
@@ -164,8 +109,4 @@ function getAgentNote(
   const scenarioText = scenario === "cloudy" || scenario === "overheat" ? " 시나리오 조건을 함께 반영했습니다." : "";
 
   return `${location.name} 위치의 ${sourceText}을 Agent 판단 보조 데이터로 사용합니다. ${decision}${scenarioText}`;
-}
-
-function clampWeather(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value));
 }

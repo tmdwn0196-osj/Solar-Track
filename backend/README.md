@@ -6,7 +6,7 @@ SolarTrack Agent의 FastAPI 백엔드다.
 
 - `GET /api/health`: 서버 상태 확인
 - `POST /api/simulate/step`: 1스텝 시뮬레이션 계산
-- `POST /api/weather/context`: 위치와 시나리오 기반 기상 컨텍스트 반환
+- `POST /api/weather/context`: 기상청 API 허브 KIM 기반 기상 컨텍스트 반환, 실패 시 시나리오 대체값 반환
 - `POST /api/diagnosis`: 상태 재계산 후 진단 결과 반환
 - `POST /api/vision/infer`: 시나리오 기반 가상 비전 추론
 - `GET /api/vision/classes`: v09 비전 데이터셋 클래스와 폴더 구조 조회
@@ -43,6 +43,16 @@ collect_sensor
 ## Hardware Gateway
 
 하드웨어 명령은 항상 백엔드 안전 게이트를 통과한다. 현재 v10 구현은 실제 모터 제어가 아니라 ESP32가 보낸 텔레메트리를 검증하고 안전한 응답 JSON을 반환하는 단계다.
+
+## Weather Source
+
+백엔드 기상 API는 기상청 API 허브의 한국형수치예보모델(KIM) 자료 조회를 우선 사용한다.
+
+```powershell
+$env:KMA_APIHUB_AUTH_KEY="발급받은_인증키"
+```
+
+현재 어댑터는 `nph-kim_grib_pt_txt1` 격자점 조회 API를 호출한다. KIM 변수코드는 API 허브 참고자료 기준으로 `KMA_KIM_VARN` 등 환경변수에서 조정한다. 인증키가 없거나 응답 파싱에 실패하면 기존 시나리오 기반 기상값을 `fallback`으로 반환한다.
 
 ## 실행
 

@@ -4,7 +4,7 @@ import type { WeatherState } from "../types/solar";
 
 const sourceLabels: Record<WeatherState["source"], string> = {
   scenario: "시나리오",
-  "open-meteo": "Open-Meteo",
+  "kma-kim": "기상청 KIM",
   fallback: "대체값",
 };
 

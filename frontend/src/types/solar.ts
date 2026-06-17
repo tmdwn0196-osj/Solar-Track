@@ -9,7 +9,7 @@ export type Scenario =
 
 export type RiskLevel = "normal" | "warning" | "danger";
 
-export type WeatherSource = "scenario" | "open-meteo" | "fallback";
+export type WeatherSource = "scenario" | "kma-kim" | "fallback";
 
 export type WeatherLocation = {
   id: string;

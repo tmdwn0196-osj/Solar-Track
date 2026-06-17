@@ -20,6 +20,7 @@ frontend/dist/
 frontend/vite*.log
 frontend/*.png
 .chrome-v01/
+.tools/
 
 # Local Codex project rules
 SKILL.md

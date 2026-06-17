@@ -1,4 +1,10 @@
-﻿## 2026-06-17 18:12 KST - 실제 하드웨어 BOM 및 펌웨어 추가
+﻿## 2026-06-17 18:27 KST - Arduino CLI 펌웨어 컴파일 검증
+
+- Changed: `.gitignore`, `UPDATE.md`
+- Actions: 프로젝트 로컬 `.tools/` 경로에 Arduino CLI 1.5.1을 설치해 실행 확인했다. ESP32 보드 매니저 URL을 추가하고 `esp32:esp32@3.3.10` 코어와 펌웨어 의존 라이브러리를 설치했다. 로컬 도구 바이너리는 저장소에 포함되지 않도록 `.gitignore`에 추가했다.
+- Validation: `arduino-cli compile --fqbn esp32:esp32:esp32 hardware\esp32_solartrack_gateway` passed; sketch uses 1,104,335 bytes of program storage and 50,524 bytes of dynamic memory.
+
+## 2026-06-17 18:12 KST - 실제 하드웨어 BOM 및 펌웨어 추가
 
 - Changed: `backend/hardware_gateway.py`, `docs/v12_hardware_bom.md`, `hardware/README.md`, `hardware/wiring.md`, `hardware/esp32_solartrack_gateway/esp32_solartrack_gateway.ino`
 - Actions: 실제 ESP32 기반 모형 제작을 위한 BOM, 배선안, Arduino 펌웨어 골격을 추가했다. 백엔드 하드웨어 프로필을 벤치 게이트웨이 구성으로 확장하고, ESP32 텔레메트리의 강수/풍속/비상정지 조건에 따라 `move` 또는 `hold` 명령을 반환하도록 한국어 안전 사유를 정리했다.

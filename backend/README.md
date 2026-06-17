@@ -56,6 +56,8 @@ $env:KMA_APIHUB_AUTH_KEY="발급받은_인증키"
 
 현재 어댑터는 `nph-kim_grib_pt_txt1` 격자점 조회 API를 호출한다. KIM 변수코드는 API 허브 참고자료 기준으로 `KMA_KIM_VARN` 등 환경변수에서 조정한다. 인증키가 없거나 응답 파싱에 실패하면 기존 시나리오 기반 기상값을 `fallback`으로 반환한다.
 
+KMA API Hub가 `403 활용신청이 필요한 API 입니다`를 반환하면 코드 문제가 아니라 현재 인증키에 해당 KIM API 활용 권한이 없는 상태다. 이 경우 응답에는 fallback 데이터를 사용한다는 문구와 API Hub 거부 사유만 표시하고, 인증키는 노출하지 않는다.
+
 ## 실행
 
 ```powershell

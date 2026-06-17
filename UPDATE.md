@@ -1,4 +1,10 @@
-﻿## 2026-06-17 11:23 KST - 기상 fallback 안내 문구 명시
+﻿## 2026-06-17 11:36 KST - KMA fallback 원인 재검토
+
+- Changed: `UPDATE.md`, `backend/README.md`, `backend/kma_kim_weather.py`
+- Actions: KMA API Hub KIM 호출을 실제 `.env` 로드 경로로 재검증했고, 현재 fallback 원인이 `403 활용신청이 필요한 API 입니다` 응답임을 확인했다. 백엔드가 httpx 예외 문자열을 그대로 반환하지 않고 KMA 응답의 상태/메시지만 추출하도록 변경해 인증키가 응답에 노출되지 않게 했다.
+- Validation: `uv run python -m py_compile main.py backend\__init__.py backend\app.py backend\models.py backend\simulation.py backend\agent_graph.py backend\vision_dataset.py backend\hardware_gateway.py backend\demo_report.py backend\kma_kim_weather.py` passed; `npm run build` passed; FastAPI TestClient call for `/api/weather/context` returned `source=fallback`, `collectedAt=fallback 데이터 사용`, `HTTP 403 - 활용신청이 필요한 API 입니다`, and no `authKey` or key prefix in the response.
+
+## 2026-06-17 11:23 KST - 기상 fallback 안내 문구 명시
 
 - Changed: `UPDATE.md`, `backend/kma_kim_weather.py`, `frontend/src/components/WeatherPanel.tsx`, `frontend/src/logic/weatherModel.ts`, `frontend/src/styles.css`
 - Actions: 기상청 KIM 데이터를 사용할 수 없어 fallback으로 전환될 때 API 응답과 프론트엔드 기상 패널에 fallback 데이터를 사용한다는 문구와 403 거부 원인이 명확히 표시되도록 보강했다. 런타임과 문서에서 특정 외부 기상 서비스 직접 사용 표현을 제거했다.

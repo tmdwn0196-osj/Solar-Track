@@ -13,6 +13,10 @@ from backend.simulation import LOCATIONS, calculate_weather
 KMA_KIM_POINT_URL = "https://apihub.kma.go.kr/api/typ06/cgi-bin/url/nph-kim_grib_pt_txt1"
 
 
+class KmaKimRequestError(RuntimeError):
+    """Raised when KMA API Hub rejects or cannot serve the KIM request."""
+
+
 def fetch_kma_kim_weather(scenario: str, location_id: str) -> dict[str, Any]:
     location = LOCATIONS.get(location_id, LOCATIONS["seoul"])
     auth_key = os.getenv("KMA_APIHUB_AUTH_KEY", "").strip()
@@ -21,7 +25,7 @@ def fetch_kma_kim_weather(scenario: str, location_id: str) -> dict[str, Any]:
         return with_fallback_note(
             scenario,
             location_id,
-            "KMA_APIHUB_AUTH_KEY is not set. Fallback weather data is being used.",
+            "KMA_APIHUB_AUTH_KEY가 설정되지 않았습니다.",
         )
 
     try:
@@ -37,11 +41,17 @@ def fetch_kma_kim_weather(scenario: str, location_id: str) -> dict[str, Any]:
                 "weather context. Scenario constraints are still applied for demo safety."
             ),
         }
+    except KmaKimRequestError as exc:
+        return with_fallback_note(
+            scenario,
+            location_id,
+            f"KMA KIM 요청 실패: {exc}",
+        )
     except Exception as exc:
         return with_fallback_note(
             scenario,
             location_id,
-            f"KMA KIM request failed: {exc}. Fallback weather data is being used.",
+            f"KMA KIM 처리 실패: {exc}",
         )
 
 
@@ -70,7 +80,8 @@ def request_kim_values(location: dict[str, Any], auth_key: str) -> dict[str, Any
 
     with httpx.Client(timeout=8) as client:
         response = client.get(KMA_KIM_POINT_URL, params=params)
-        response.raise_for_status()
+
+    ensure_kma_success(response)
 
     values = parse_ascii_values(response.text)
     if not values:
@@ -98,6 +109,42 @@ def merge_kim_values(weather: dict[str, Any], kim_values: dict[str, Any]) -> dic
         "KMA KIM forecast temperature is reflected; cloud, rain, and wind use scenario fallback until variable codes are configured."
     )
     return updated
+
+
+def ensure_kma_success(response: httpx.Response) -> None:
+    if response.status_code >= 400:
+        raise KmaKimRequestError(describe_kma_response_error(response))
+
+    try:
+        payload = response.json()
+    except ValueError:
+        return
+
+    result = payload.get("result") if isinstance(payload, dict) else None
+    if not isinstance(result, dict):
+        return
+
+    status = result.get("status")
+    if isinstance(status, int) and status >= 400:
+        message = result.get("message", "KMA API Hub error")
+        raise KmaKimRequestError(f"HTTP {status} - {message}")
+
+
+def describe_kma_response_error(response: httpx.Response) -> str:
+    try:
+        payload = response.json()
+    except ValueError:
+        text = response.text.strip().replace("\n", " ")
+        detail = text[:160] if text else response.reason_phrase
+        return f"HTTP {response.status_code} - {detail}"
+
+    result = payload.get("result") if isinstance(payload, dict) else None
+    if isinstance(result, dict):
+        status = result.get("status", response.status_code)
+        message = result.get("message", response.reason_phrase)
+        return f"HTTP {status} - {message}"
+
+    return f"HTTP {response.status_code} - {response.reason_phrase}"
 
 
 def with_fallback_note(scenario: str, location_id: str, note: str) -> dict[str, Any]:

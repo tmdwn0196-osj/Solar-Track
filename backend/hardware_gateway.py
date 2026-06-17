@@ -14,10 +14,27 @@ MIN_BATTERY_VOLTAGE = 11.2
 def get_hardware_profile() -> dict[str, Any]:
     return {
         "controller": "ESP32",
-        "mode": "simulated_gateway",
-        "sensors": ["ldr_left", "ldr_right", "ldr_top", "ldr_bottom", "ina219", "ds18b20"],
+        "mode": "bench_gateway",
+        "sensors": [
+            "ldr_left",
+            "ldr_right",
+            "ldr_top",
+            "ldr_bottom",
+            "ina219",
+            "ds18b20",
+            "rain",
+            "wind_analog",
+        ],
+        "safetyInputs": [
+            "emergency_stop",
+            "azimuth_min_limit",
+            "azimuth_max_limit",
+            "elevation_min_limit",
+            "elevation_max_limit",
+        ],
         "actuators": ["azimuth_stepper", "elevation_servo"],
         "camera": "optional_esp32_cam_or_external_module",
+        "recommendedIntervalMs": 2000,
         "limits": {
             "azimuth": {"min": AZIMUTH_LIMIT[0], "max": AZIMUTH_LIMIT[1], "unit": "deg"},
             "elevation": {"min": ELEVATION_LIMIT[0], "max": ELEVATION_LIMIT[1], "unit": "deg"},
@@ -27,7 +44,7 @@ def get_hardware_profile() -> dict[str, Any]:
         },
         "safety": [
             "LLM은 모터를 직접 제어하지 않습니다.",
-            "백엔드는 명령을 반환하기 전에 모든 목표 각도를 검증합니다.",
+            "백엔드는 명령을 반환하기 전에 모든 목표 각도를 제한 범위로 검증합니다.",
             "강수, 강풍, 과열, 저전압, 센서 이상이 있으면 보류 명령을 반환합니다.",
         ],
     }

@@ -1,4 +1,10 @@
-﻿## 2026-06-17 17:58 KST - KIM 기상 변수 확장
+﻿## 2026-06-17 18:12 KST - 실제 하드웨어 BOM 및 펌웨어 추가
+
+- Changed: `backend/hardware_gateway.py`, `docs/v12_hardware_bom.md`, `hardware/README.md`, `hardware/wiring.md`, `hardware/esp32_solartrack_gateway/esp32_solartrack_gateway.ino`
+- Actions: 실제 ESP32 기반 모형 제작을 위한 BOM, 배선안, Arduino 펌웨어 골격을 추가했다. 백엔드 하드웨어 프로필을 벤치 게이트웨이 구성으로 확장하고, ESP32 텔레메트리의 강수/풍속/비상정지 조건에 따라 `move` 또는 `hold` 명령을 반환하도록 한국어 안전 사유를 정리했다.
+- Validation: `uv run python -m py_compile main.py backend\__init__.py backend\app.py backend\models.py backend\simulation.py backend\agent_graph.py backend\vision_dataset.py backend\hardware_gateway.py backend\demo_report.py backend\kma_kim_weather.py` passed; `npm run build` passed; FastAPI TestClient calls for `/api/hardware/profile` and `/api/hardware/telemetry` returned `bench_gateway`, safe `move`, and rain/emergency `hold`; source search found no mojibake patterns. `arduino-cli` is not installed, so Arduino sketch compilation was not run.
+
+## 2026-06-17 17:58 KST - KIM 기상 변수 확장
 
 - Changed: `.env.example`, `UPDATE.md`, `backend/kma_kim_weather.py`, `backend/simulation.py`, `frontend/src/components/WeatherPanel.tsx`, `frontend/src/logic/weatherModel.ts`, `frontend/src/types/solar.ts`
 - Actions: KIM 모드에서 `t2m` 온도뿐 아니라 `ws` 풍속과 `rh2m` 상대습도를 함께 반영하도록 확장했다. 기상 응답에 `valueSources`를 추가해 온도/풍속/습도는 KIM, 구름량/강수는 시나리오 기반임을 프론트 기상 패널에 표시하도록 했다.

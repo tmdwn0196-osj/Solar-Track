@@ -1,7 +1,7 @@
 ﻿## 2026-06-17 11:23 KST - 기상 fallback 안내 문구 명시
 
 - Changed: `UPDATE.md`, `backend/kma_kim_weather.py`, `frontend/src/components/WeatherPanel.tsx`, `frontend/src/logic/weatherModel.ts`, `frontend/src/styles.css`
-- Actions: 기상청 KIM 데이터를 사용할 수 없어 fallback으로 전환될 때 API 응답의 `reason`, `collectedAt`, `agentNote`와 프론트엔드 기상 패널에 fallback 데이터를 사용한다는 문구가 명확히 표시되도록 보강했다. 런타임과 문서에서 특정 외부 기상 서비스 직접 사용 표현을 제거했다.
+- Actions: 기상청 KIM 데이터를 사용할 수 없어 fallback으로 전환될 때 API 응답과 프론트엔드 기상 패널에 fallback 데이터를 사용한다는 문구와 403 거부 원인이 명확히 표시되도록 보강했다. 런타임과 문서에서 특정 외부 기상 서비스 직접 사용 표현을 제거했다.
 - Validation: deprecated external weather service references were removed; `uv run python -m py_compile main.py backend\__init__.py backend\app.py backend\models.py backend\simulation.py backend\agent_graph.py backend\vision_dataset.py backend\hardware_gateway.py backend\demo_report.py backend\kma_kim_weather.py` passed; `npm run build` passed; `uv run python main.py` printed `Hello from solar-track!`; FastAPI TestClient call for `/api/weather/context` returned `source=fallback`, `collectedAt=fallback 데이터 사용`, and explicit fallback message; temporary `uvicorn` server returned `/api/health` successfully.
 
 ## 2026-06-17 11:21 KST - 기상청 KIM 기상 API 연동
@@ -92,3 +92,8 @@
 - Changed: `frontend/README.md`, `frontend/src/App.tsx`, `frontend/src/types/solar.ts`, `frontend/src/logic/sensorModel.ts`, `frontend/src/logic/diagnosisAgent.ts`, `frontend/src/components/AgentPanel.tsx`, `frontend/src/styles.css`
 - Actions: 진단 결과에 위험도와 근거 목록을 추가하고 평균 조도, 발전량 개선률, 기상, Vision, 시나리오 근거가 Agent 패널에 표시되도록 구현함
 - Validation: `npm run build` passed; `npm audit --audit-level=high` found 0 vulnerabilities; `uv run python -m py_compile main.py` passed; `uv run python main.py` printed `Hello from solar-track!`; Chrome headless screenshot/DOM render verified
+## 2026-06-17 15:32 KST - 백엔드 .env 자동 로드
+
+- Changed: `backend/__init__.py`, `backend/README.md`, `UPDATE.md`
+- Actions: 백엔드 패키지 초기화 시 저장소 루트의 `.env`를 자동 로드하도록 추가해, KMA API Hub 인증키가 프로세스 환경변수로 주입되지 않아 fallback으로 떨어지는 문제를 해결했다. 현재 fallback은 `.env` 값이 읽힌 뒤 KMA API Hub가 403으로 요청을 거부할 때만 발생한다.
+- Validation: `uv run python -m py_compile backend\__init__.py backend\kma_kim_weather.py backend\app.py` passed; `uv run python`-based FastAPI TestClient weather call still returned `source=fallback` with explicit KMA 403 reason because the API Hub rejected the current key.

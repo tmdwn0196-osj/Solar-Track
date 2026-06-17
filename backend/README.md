@@ -48,6 +48,8 @@ collect_sensor
 
 백엔드 기상 API는 기상청 API 허브의 한국형수치예보모델(KIM) 자료 조회를 우선 사용한다.
 
+백엔드 패키지는 저장소 루트의 `.env`를 자동으로 읽는다.
+
 ```powershell
 $env:KMA_APIHUB_AUTH_KEY="발급받은_인증키"
 ```

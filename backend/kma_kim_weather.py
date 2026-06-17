@@ -104,7 +104,7 @@ def with_fallback_note(scenario: str, location_id: str, note: str) -> dict[str, 
     weather = calculate_weather(scenario, location_id, source="fallback")
     return {
         **weather,
-        "reason": f"{weather['reason']} KMA KIM 데이터를 사용할 수 없어 fallback 데이터를 사용합니다.",
+        "reason": f"{weather['reason']} {note} KMA KIM 데이터를 사용할 수 없어 fallback 데이터를 사용합니다.",
         "collectedAt": "fallback 데이터 사용",
         "agentNote": f"{weather['locationName']} KMA KIM fallback: {note}",
     }

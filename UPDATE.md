@@ -1,3 +1,9 @@
+## 2026-06-17 10:29 KST - v11 시연 리포트 구성
+
+- Changed: `README.md`, `UPDATE.md`, `backend/app.py`, `backend/models.py`, `backend/demo_report.py`, `backend/README.md`, `docs/v11_demo_scenario_and_report.md`, `frontend/README.md`, `frontend/src/App.tsx`, `frontend/src/components/DemoReportPanel.tsx`, `frontend/src/logic/reportModel.ts`, `frontend/src/styles.css`
+- Actions: 발표용 시나리오 목록과 현재 SolarState 기반 리포트 생성 API를 추가하고, 프론트엔드에 Demo Report 패널을 추가했다. 시나리오별 목표, 발전량 비교, 위험도, 진단, 조치, 발표 문장을 한 화면과 API 응답에서 확인할 수 있게 했다.
+- Validation: `uv run python -m py_compile main.py backend\__init__.py backend\app.py backend\models.py backend\simulation.py backend\agent_graph.py backend\vision_dataset.py backend\hardware_gateway.py backend\demo_report.py` passed; `uv run python main.py` printed `Hello from solar-track!`; `npm run build` passed; FastAPI TestClient calls for `/api/demo/scenarios` and `/api/demo/report` passed; temporary `uvicorn` server returned `/api/health` successfully.
+
 ## 2026-06-17 10:21 KST - v10 ESP32 하드웨어 게이트웨이 준비
 
 - Changed: `README.md`, `UPDATE.md`, `backend/app.py`, `backend/models.py`, `backend/hardware_gateway.py`, `backend/README.md`, `docs/v10_esp32_hardware_plan.md`, `hardware/README.md`, `hardware/esp32_solartrack_gateway/esp32_solartrack_gateway.ino`

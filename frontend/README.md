@@ -15,6 +15,7 @@ SolarTrack Agent의 React 시뮬레이터다.
 - FastAPI 백엔드 기반 시뮬레이션 스텝과 기상 컨텍스트 호출
 - 백엔드 미실행 시 기존 브라우저 내 계산으로 자동 fallback
 - Vision 패널에서 가상 비전 클래스, 신뢰도, 감지 후보 표시
+- Demo Report 패널에서 현재 시나리오의 발표용 요약과 설명 문장 표시
 
 ## 실행
 

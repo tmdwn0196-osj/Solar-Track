@@ -29,6 +29,10 @@ class StateRequest(BaseModel):
     state: dict[str, Any]
 
 
+class DemoReportRequest(BaseModel):
+    state: dict[str, Any]
+
+
 class ControlCommandRequest(BaseModel):
     state: dict[str, Any]
     command: Literal["track_step", "hold", "validate"]

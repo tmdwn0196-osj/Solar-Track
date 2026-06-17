@@ -4,9 +4,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.agent_graph import run_agent_graph
+from backend.demo_report import build_demo_report, get_demo_scenarios
 from backend.hardware_gateway import evaluate_hardware_telemetry, get_hardware_profile
 from backend.models import (
     ControlCommandRequest,
+    DemoReportRequest,
     HardwareTelemetryRequest,
     StateRequest,
     VisionInferRequest,
@@ -16,7 +18,7 @@ from backend.simulation import calculate_weather, diagnose_state, infer_vision, 
 from backend.vision_dataset import get_vision_dataset_summary
 
 
-app = FastAPI(title="SolarTrack Agent API", version="0.10.0")
+app = FastAPI(title="SolarTrack Agent API", version="0.11.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -34,7 +36,7 @@ app.add_middleware(
 
 @app.get("/api/health")
 def health() -> dict[str, str]:
-    return {"status": "ok", "service": "solartrack-backend", "version": "0.10.0"}
+    return {"status": "ok", "service": "solartrack-backend", "version": "0.11.0"}
 
 
 @app.post("/api/simulate/step")
@@ -98,3 +100,13 @@ def hardware_profile() -> dict[str, object]:
 @app.post("/api/hardware/telemetry")
 def hardware_telemetry(request: HardwareTelemetryRequest) -> dict[str, object]:
     return {"hardware": evaluate_hardware_telemetry(request.model_dump())}
+
+
+@app.get("/api/demo/scenarios")
+def demo_scenarios() -> dict[str, object]:
+    return {"scenarios": get_demo_scenarios()}
+
+
+@app.post("/api/demo/report")
+def demo_report(request: DemoReportRequest) -> dict[str, object]:
+    return {"report": build_demo_report(request.state)}

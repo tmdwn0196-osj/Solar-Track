@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AgentPanel } from "./components/AgentPanel";
 import { ControlPanel } from "./components/ControlPanel";
 import { DashboardPanel } from "./components/DashboardPanel";
+import { DemoReportPanel } from "./components/DemoReportPanel";
 import { LogPanel } from "./components/LogPanel";
 import { ModelPanel } from "./components/ModelPanel";
 import { PowerChart } from "./components/PowerChart";
@@ -278,7 +279,7 @@ function App() {
     <main className="app-shell">
       <header className="topbar">
         <div>
-          <p className="eyebrow">v09 Vision Dataset Stub</p>
+          <p className="eyebrow">v11 Demo Scenario Report</p>
           <h1>SolarTrack Agent</h1>
         </div>
         <div className="status-strip">
@@ -317,6 +318,7 @@ function App() {
           <ModelPanel powerBreakdown={state.powerBreakdown} />
           <VisionPanel vision={state.vision} />
           <AgentPanel state={state} />
+          <DemoReportPanel state={state} />
         </aside>
       </div>
     </main>

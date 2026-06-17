@@ -14,6 +14,8 @@ SolarTrack Agent의 FastAPI 백엔드다.
 - `POST /api/agent/evaluate`: LangGraph 기반 Agent 상태 그래프 실행
 - `GET /api/hardware/profile`: ESP32 하드웨어 구성과 안전 제한 조회
 - `POST /api/hardware/telemetry`: ESP32 텔레메트리 검증 후 `hold` 또는 `move` 명령 반환
+- `GET /api/demo/scenarios`: 발표용 시연 시나리오 목록 반환
+- `POST /api/demo/report`: 현재 상태 기반 발표 리포트 생성
 
 ## LangGraph Agent 흐름
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AgentPanel } from "./components/AgentPanel";
 import { ControlPanel } from "./components/ControlPanel";
 import { DashboardPanel } from "./components/DashboardPanel";
@@ -18,6 +18,7 @@ import { calculateSunPosition } from "./logic/sunModel";
 import { calculateAngleErrors, clamp, runTrackingStep } from "./logic/trackingAgent";
 import { inferVirtualVision } from "./logic/visionModel";
 import { calculateWeather, fetchLocationWeather } from "./logic/weatherModel";
+import { requestSimulationStep, requestWeatherContext } from "./logic/apiClient";
 import type { Scenario, SolarState } from "./types/solar";
 
 const initialScenario: Scenario = "normal";
@@ -143,10 +144,15 @@ function recalculateState(input: SolarState): SolarState {
 
 function App() {
   const [state, setState] = useState<SolarState>(() => createInitialState());
+  const stateRef = useRef(state);
   const currentScenario = useMemo(
     () => scenarios.find((item) => item.value === state.scenario),
     [state.scenario],
   );
+
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
 
   useEffect(() => {
     const location = findWeatherLocation(state.weatherLocationId);
@@ -160,7 +166,10 @@ function App() {
       }),
     );
 
-    fetchLocationWeather(location, state.scenario).then((weather) => {
+    async function syncWeather() {
+      const weather = await requestWeatherContext(state.scenario, location.id).catch(() =>
+        fetchLocationWeather(location, state.scenario),
+      );
       if (cancelled) return;
 
       setState((previous) => {
@@ -174,7 +183,9 @@ function App() {
           logs: appendLog(previous.logs, `${formatTime(previous.time)} ${weather.locationName} 기상 반영: ${weather.label}`),
         });
       });
-    });
+    }
+
+    void syncWeather();
 
     return () => {
       cancelled = true;
@@ -184,31 +195,46 @@ function App() {
   useEffect(() => {
     if (!state.running) return;
 
-    const timer = window.setInterval(() => {
-      setState((previous) => {
-        const nextTime = previous.time >= 18 ? 6 : Number((previous.time + 0.1).toFixed(1));
-        const prepared = recalculateState({ ...previous, time: nextTime, phase: "weather_check" });
-        const tracking = runTrackingStep(prepared);
-        const updated = recalculateState({ ...prepared, ...tracking });
-        const nextHistory = [
-          ...updated.history,
-          {
-            time: updated.time,
-            fixedPower: updated.fixedPower,
-            trackedPower: updated.trackedPower,
-          },
-        ].slice(-60);
-        const logMessage = `${formatTime(updated.time)} ${logForPhase(updated)}`;
+    let inFlight = false;
+    let cancelled = false;
 
-        return {
-          ...updated,
-          history: nextHistory,
-          logs: appendLog(updated.logs, logMessage),
-        };
-      });
+    const timer = window.setInterval(() => {
+      if (inFlight) return;
+      inFlight = true;
+      const requestState = stateRef.current;
+
+      requestSimulationStep(requestState)
+        .then((nextState) => {
+          if (cancelled) return;
+          setState((previous) => {
+            if (
+              !previous.running ||
+              previous.scenario !== requestState.scenario ||
+              previous.weatherLocationId !== requestState.weatherLocationId
+            ) {
+              return previous;
+            }
+
+            return {
+              ...nextState,
+              running: previous.running,
+              autoTracking: previous.autoTracking,
+            };
+          });
+        })
+        .catch(() => {
+          if (cancelled) return;
+          setState(advanceLocalSimulation);
+        })
+        .finally(() => {
+          inFlight = false;
+        });
     }, 900);
 
-    return () => window.clearInterval(timer);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
   }, [state.running]);
 
   function updateScenario(scenario: Scenario) {
@@ -252,7 +278,7 @@ function App() {
     <main className="app-shell">
       <header className="topbar">
         <div>
-          <p className="eyebrow">v06 대시보드 UI</p>
+          <p className="eyebrow">v07 FastAPI 연동</p>
           <h1>SolarTrack Agent</h1>
         </div>
         <div className="status-strip">
@@ -305,6 +331,28 @@ function formatTime(time: number) {
 
 function logForPhase(state: SolarState) {
   return state.phaseReason || "기상, 센서, 발전량 상태를 갱신했습니다.";
+}
+
+function advanceLocalSimulation(previous: SolarState): SolarState {
+  const nextTime = previous.time >= 18 ? 6 : Number((previous.time + 0.1).toFixed(1));
+  const prepared = recalculateState({ ...previous, time: nextTime, phase: "weather_check" });
+  const tracking = runTrackingStep(prepared);
+  const updated = recalculateState({ ...prepared, ...tracking });
+  const nextHistory = [
+    ...updated.history,
+    {
+      time: updated.time,
+      fixedPower: updated.fixedPower,
+      trackedPower: updated.trackedPower,
+    },
+  ].slice(-60);
+  const logMessage = `${formatTime(updated.time)} ${logForPhase(updated)}`;
+
+  return {
+    ...updated,
+    history: nextHistory,
+    logs: appendLog(updated.logs, logMessage),
+  };
 }
 
 function appendLog(logs: string[], message: string) {

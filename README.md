@@ -45,4 +45,4 @@ React Web Simulator
 
 ## 현재 진행 단계
 
-현재 단계: v00 문서화 및 프로젝트 구조 설계
+현재 단계: v07 FastAPI 백엔드 분리

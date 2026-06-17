@@ -1,6 +1,6 @@
 # frontend
 
-SolarTrack Agent의 React 단독 시뮬레이터다.
+SolarTrack Agent의 React 시뮬레이터다.
 
 ## 현재 포함 범위
 
@@ -12,6 +12,8 @@ SolarTrack Agent의 React 단독 시뮬레이터다.
 - 진단 근거와 위험도 표시
 - 위치 선택 기반 기상 수집 Agent와 수집 실패 시 시나리오 대체값 처리
 - 운전 상태, Agent 단계, 위험도, 기상 계수, 누적 발전량을 한눈에 보는 대시보드 요약
+- FastAPI 백엔드 기반 시뮬레이션 스텝과 기상 컨텍스트 호출
+- 백엔드 미실행 시 기존 브라우저 내 계산으로 자동 fallback
 
 ## 실행
 
@@ -21,3 +23,5 @@ npm run dev
 ```
 
 기본 주소는 `http://127.0.0.1:5173`이다.
+
+백엔드 기본 주소는 `http://127.0.0.1:8000`이다. 다른 주소를 쓰려면 `VITE_API_BASE_URL`을 설정한다.

@@ -1,0 +1,1 @@
+"""SolarTrack backend package."""

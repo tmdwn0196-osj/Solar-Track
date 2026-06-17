@@ -278,7 +278,7 @@ function App() {
     <main className="app-shell">
       <header className="topbar">
         <div>
-          <p className="eyebrow">v07 FastAPI 연동</p>
+          <p className="eyebrow">v09 Vision Dataset Stub</p>
           <h1>SolarTrack Agent</h1>
         </div>
         <div className="status-strip">

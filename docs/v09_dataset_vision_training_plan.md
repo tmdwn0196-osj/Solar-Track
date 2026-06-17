@@ -41,3 +41,18 @@ MobileNetV3, EfficientNet-B0, ResNet18은 분류 후보로 둔다. YOLOv8n, YOLO
 ## 7. API 연결
 
 학습 후에는 FastAPI의 `/api/vision/infer`로 추론 결과를 반환한다.
+
+## 8. v09 구현 상태
+
+현재 단계에서는 실제 이미지 다운로드나 학습을 수행하지 않는다. 대신 데이터셋 구조와 가상 추론 메타데이터를 코드에 반영했다.
+
+| 항목 | 구현 내용 |
+|---|---|
+| 데이터셋 구조 | `datasets/images/raw`, `datasets/images/train`, `datasets/images/val`, `datasets/labels/classification`, `datasets/labels/detection` |
+| 샘플 매니페스트 | `datasets/sample_manifest.csv` |
+| 클래스 메타데이터 | `backend/vision_dataset.py` |
+| API | `GET /api/vision/classes` |
+| 가상 추론 확장 | `/api/vision/infer` 결과에 `primaryClass`, `confidence`, `detections`, `modelMode` 추가 |
+| 프론트 표시 | Vision 패널에 클래스와 신뢰도 표시 |
+
+이후 실제 데이터가 준비되면 매니페스트를 기준으로 학습/검증 split을 만들고, 추론 서버는 기존 `/api/vision/infer` 응답 형태를 유지한다.

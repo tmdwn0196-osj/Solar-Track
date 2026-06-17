@@ -4,6 +4,8 @@ from datetime import datetime, timezone
 from math import pi, sin
 from typing import Any
 
+from backend.vision_dataset import build_virtual_vision_result
+
 
 LOCATIONS: dict[str, dict[str, Any]] = {
     "seoul": {
@@ -77,27 +79,36 @@ def infer_vision(scenario: str) -> dict[str, Any]:
             "cloudDetected": True,
             "soilingDetected": False,
             "shadeDetected": False,
-            "note": "Cloud cover detected. Tracking correction is temporarily conservative.",
+            **build_virtual_vision_result(
+                scenario,
+                "Cloud cover detected. Tracking correction is temporarily conservative.",
+            ),
         }
     if scenario == "soiling":
         return {
             "cloudDetected": False,
             "soilingDetected": True,
             "shadeDetected": False,
-            "note": "Possible dust or soiling detected on the panel surface.",
+            **build_virtual_vision_result(
+                scenario,
+                "Possible dust or soiling detected on the panel surface.",
+            ),
         }
     if scenario == "shade":
         return {
             "cloudDetected": False,
             "soilingDetected": False,
             "shadeDetected": True,
-            "note": "Partial shading detected near the panel.",
+            **build_virtual_vision_result(
+                scenario,
+                "Partial shading detected near the panel.",
+            ),
         }
     return {
         "cloudDetected": False,
         "soilingDetected": False,
         "shadeDetected": False,
-        "note": "Vision inference is stable.",
+        **build_virtual_vision_result(scenario, "Vision inference is stable."),
     }
 
 

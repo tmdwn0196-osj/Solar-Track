@@ -467,6 +467,29 @@ select {
   gap: 4px;
 }
 
+.compact-list {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.compact-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 9px;
+  border: 1px solid #e0e6e2;
+  border-radius: 8px;
+  color: #5f6f67;
+  font-size: 0.82rem;
+}
+
+.compact-list strong {
+  color: #244d45;
+}
+
 .risk-badge {
   min-height: 26px;
   padding: 4px 8px;

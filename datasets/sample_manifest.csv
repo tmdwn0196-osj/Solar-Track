@@ -1,0 +1,4 @@
+image_path,split,labels,label_type,source,note
+datasets/images/raw/example_sky_clear.jpg,train,sky_clear,classification,placeholder,Replace with captured or public dataset image
+datasets/images/raw/example_panel_soiling.jpg,train,panel_soiling,detection,placeholder,Use YOLO bbox labels under datasets/labels/detection
+datasets/images/raw/example_partial_shadow.jpg,val,panel_partial_shadow,detection,placeholder,Use validation images to check false tracking diagnosis

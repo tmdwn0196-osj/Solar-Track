@@ -46,6 +46,13 @@ export type VisionState = {
   cloudDetected: boolean;
   soilingDetected: boolean;
   shadeDetected: boolean;
+  primaryClass?: string;
+  confidence?: number;
+  modelMode?: string;
+  detections?: {
+    className: string;
+    confidence: number;
+  }[];
   note: string;
 };
 

@@ -45,4 +45,4 @@ React Web Simulator
 
 ## 현재 진행 단계
 
-현재 단계: v08 LangGraph Agent 구조
+현재 단계: v09 데이터셋 및 비전모델 학습 계획

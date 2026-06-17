@@ -9,6 +9,7 @@ SolarTrack Agent의 FastAPI 백엔드다.
 - `POST /api/weather/context`: 위치와 시나리오 기반 기상 컨텍스트 반환
 - `POST /api/diagnosis`: 상태 재계산 후 진단 결과 반환
 - `POST /api/vision/infer`: 시나리오 기반 가상 비전 추론
+- `GET /api/vision/classes`: v09 비전 데이터셋 클래스와 폴더 구조 조회
 - `POST /api/control/command`: 추적/홀드 제어 명령 검증
 - `POST /api/agent/evaluate`: LangGraph 기반 Agent 상태 그래프 실행
 

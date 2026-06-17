@@ -6,9 +6,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.agent_graph import run_agent_graph
 from backend.models import ControlCommandRequest, StateRequest, VisionInferRequest, WeatherContextRequest
 from backend.simulation import calculate_weather, diagnose_state, infer_vision, recalculate_state, run_tracking_step, simulate_step
+from backend.vision_dataset import get_vision_dataset_summary
 
 
-app = FastAPI(title="SolarTrack Agent API", version="0.8.0")
+app = FastAPI(title="SolarTrack Agent API", version="0.9.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -26,7 +27,7 @@ app.add_middleware(
 
 @app.get("/api/health")
 def health() -> dict[str, str]:
-    return {"status": "ok", "service": "solartrack-backend", "version": "0.8.0"}
+    return {"status": "ok", "service": "solartrack-backend", "version": "0.9.0"}
 
 
 @app.post("/api/simulate/step")
@@ -52,6 +53,11 @@ def diagnosis(request: StateRequest) -> dict[str, object]:
 @app.post("/api/vision/infer")
 def vision_infer(request: VisionInferRequest) -> dict[str, object]:
     return {"vision": infer_vision(request.scenario)}
+
+
+@app.get("/api/vision/classes")
+def vision_classes() -> dict[str, object]:
+    return {"visionDataset": get_vision_dataset_summary()}
 
 
 @app.post("/api/control/command")

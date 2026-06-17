@@ -1,3 +1,9 @@
+## 2026-06-17 10:16 KST - v09 데이터셋 및 비전모델 학습 준비
+
+- Changed: `README.md`, `UPDATE.md`, `backend/app.py`, `backend/simulation.py`, `backend/vision_dataset.py`, `backend/README.md`, `docs/v09_dataset_vision_training_plan.md`, `datasets/README.md`, `datasets/sample_manifest.csv`, `datasets/images/`, `datasets/labels/`, `frontend/README.md`, `frontend/src/App.tsx`, `frontend/src/components/VisionPanel.tsx`, `frontend/src/logic/visionModel.ts`, `frontend/src/styles.css`, `frontend/src/types/solar.ts`
+- Actions: v09 데이터셋 폴더 골격과 샘플 매니페스트를 추가하고, 비전 클래스 메타데이터 및 `/api/vision/classes` 엔드포인트를 구현했다. 가상 비전 추론 결과에 `primaryClass`, `confidence`, `detections`, `modelMode`를 추가하고 Vision 패널에서 클래스와 신뢰도를 확인할 수 있게 했다.
+- Validation: `npm run build` passed; `uv run python -m py_compile main.py backend\__init__.py backend\app.py backend\models.py backend\simulation.py backend\agent_graph.py backend\vision_dataset.py` passed; `uv run python main.py` printed `Hello from solar-track!`; FastAPI TestClient calls for `/api/health`, `/api/vision/classes`, `/api/vision/infer` passed; temporary `uvicorn` server returned `/api/health` successfully.
+
 ## 2026-06-17 10:11 KST - v08 LangGraph Agent 구조
 
 - Changed: `pyproject.toml`, `uv.lock`, `backend/agent_graph.py`, `backend/app.py`, `backend/README.md`, `docs/v08_langgraph_agent_plan.md`, `README.md`

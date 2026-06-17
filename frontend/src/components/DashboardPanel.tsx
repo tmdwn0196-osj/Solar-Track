@@ -31,14 +31,14 @@ export function DashboardPanel({ state }: { state: SolarState }) {
       </div>
       <div className="dashboard-grid">
         <Metric label="운전 상태" value={state.running ? "실행 중" : "정지"} tone={state.running ? "good" : "default"} />
-        <Metric label="Agent 단계" value={phaseLabels[state.phase]} tone={state.phase === "hold" ? "warn" : "default"} />
+        <Metric label="에이전트 단계" value={phaseLabels[state.phase]} tone={state.phase === "hold" ? "warn" : "default"} />
         <Metric label="위험도" value={riskLabels[state.riskLevel]} tone={riskTone} />
         <Metric
           label="현재 개선률"
           value={`${state.powerGainRate.toFixed(1)}%`}
           tone={state.powerGainRate >= 5 ? "good" : "default"}
         />
-        <Metric label="누적 개선" value={`${energy.gainWh.toFixed(2)} Wh`} tone={energy.gainWh > 0 ? "good" : "default"} />
+        <Metric label="누적 개선량" value={`${energy.gainWh.toFixed(2)} Wh`} tone={energy.gainWh > 0 ? "good" : "default"} />
         <Metric label="기상 계수" value={state.powerBreakdown.weatherFactor.toFixed(2)} tone={state.weather.trackingLimited ? "warn" : "good"} />
       </div>
     </section>

@@ -7,42 +7,42 @@ VISION_CLASSES: list[dict[str, str]] = [
     {
         "name": "sky_clear",
         "type": "classification",
-        "description": "Clear sky with stable sunlight.",
+        "description": "맑고 안정적인 일사 조건입니다.",
     },
     {
         "name": "sky_cloudy",
         "type": "classification",
-        "description": "Cloudy sky likely to reduce irradiance.",
+        "description": "구름으로 인해 일사량이 낮아질 수 있는 조건입니다.",
     },
     {
         "name": "sun_cloud_block",
         "type": "detection",
-        "description": "Sun is temporarily blocked by cloud.",
+        "description": "태양이 구름에 일시적으로 가려진 상태입니다.",
     },
     {
         "name": "panel_clean",
         "type": "classification",
-        "description": "Panel surface is visually clean.",
+        "description": "패널 표면이 시각적으로 깨끗한 상태입니다.",
     },
     {
         "name": "panel_soiling",
         "type": "detection",
-        "description": "Dust, dirt, or residue is visible on panel surface.",
+        "description": "패널 표면에 먼지, 오염, 잔여물이 보이는 상태입니다.",
     },
     {
         "name": "panel_partial_shadow",
         "type": "detection",
-        "description": "Partial shadow covers one or more panel areas.",
+        "description": "패널 일부 영역이 그림자로 가려진 상태입니다.",
     },
     {
         "name": "panel_foreign_object",
         "type": "detection",
-        "description": "Leaf, debris, or other object is on the panel.",
+        "description": "패널 위에 낙엽, 이물질, 기타 물체가 있는 상태입니다.",
     },
     {
         "name": "panel_damage",
         "type": "detection",
-        "description": "Crack, burn mark, or other panel damage candidate.",
+        "description": "균열, 탄 흔적 등 패널 손상 후보가 보이는 상태입니다.",
     },
 ]
 
@@ -107,7 +107,7 @@ def build_virtual_vision_result(scenario: str, note: str) -> dict[str, Any]:
     mapped = SCENARIO_VISION_MAP.get(scenario, SCENARIO_VISION_MAP["normal"])
     return {
         **mapped,
-        "modelMode": "virtual_dataset_stub",
+        "modelMode": "가상 데이터셋",
         "note": note,
     }
 
@@ -119,6 +119,6 @@ def get_vision_dataset_summary() -> dict[str, Any]:
         "imageFolders": ["datasets/images/raw", "datasets/images/train", "datasets/images/val"],
         "labelFolders": ["datasets/labels/classification", "datasets/labels/detection"],
         "sampleManifest": "datasets/sample_manifest.csv",
-        "trainingStatus": "not_started",
-        "reason": "v09 only defines dataset structure and virtual inference metadata.",
+        "trainingStatus": "학습 전",
+        "reason": "v09 단계에서는 데이터셋 구조와 가상 추론 메타데이터만 정의합니다.",
     }

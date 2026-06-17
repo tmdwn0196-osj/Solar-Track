@@ -79,7 +79,7 @@ def build_demo_report(state: dict[str, Any]) -> dict[str, Any]:
     summary = (
         f"{scenario['title']} 시나리오에서 추적식 발전량은 "
         f"{calculated['trackedPower']:.2f} W, 고정식 발전량은 {calculated['fixedPower']:.2f} W다. "
-        f"현재 개선률은 {calculated['powerGainRate']:.1f}%이며 Agent 판단은 "
+        f"현재 개선률은 {calculated['powerGainRate']:.1f}%이며 에이전트 판단은 "
         f"{calculated['diagnosis']}이다."
     )
 
@@ -119,5 +119,5 @@ def build_presentation_script(state: dict[str, Any], scenario: dict[str, str]) -
             f"고정식 {state['fixedPower']:.2f} W와 추적식 {state['trackedPower']:.2f} W를 비교해 "
             f"{state['powerGainRate']:.1f}% 개선률을 계산합니다."
         ),
-        f"Agent 진단은 '{state['diagnosis']}'이며 추천 조치는 '{state['action']}'입니다.",
+        f"에이전트 진단은 '{state['diagnosis']}'이며 추천 조치는 '{state['action']}'입니다.",
     ]

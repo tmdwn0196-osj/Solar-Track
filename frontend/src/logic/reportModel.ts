@@ -28,7 +28,7 @@ export function buildDemoReport(state: SolarState) {
     script: [
       `현재 시간은 ${formatTime(state.time)}이고 패널은 방위각 ${state.panelAzimuth.toFixed(1)}도, 고도각 ${state.panelElevation.toFixed(1)}도입니다.`,
       `발전량 개선률은 ${state.powerGainRate.toFixed(1)}%이며 위험도는 ${state.riskLevel}입니다.`,
-      `Agent 진단은 '${state.diagnosis}'입니다.`,
+      `에이전트 진단은 '${state.diagnosis}'입니다.`,
       `추천 조치는 '${state.action}'입니다.`,
     ],
   };

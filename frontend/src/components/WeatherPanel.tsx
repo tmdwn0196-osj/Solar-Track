@@ -5,7 +5,7 @@ import type { WeatherState } from "../types/solar";
 const sourceLabels: Record<WeatherState["source"], string> = {
   scenario: "시나리오",
   "kma-kim": "기상청 KIM",
-  fallback: "Fallback 데이터",
+  fallback: "대체 기상 데이터",
 };
 
 export function WeatherPanel({ weather }: { weather: WeatherState }) {
@@ -13,7 +13,7 @@ export function WeatherPanel({ weather }: { weather: WeatherState }) {
     <section className="panel">
       <div className="panel-heading">
         <CloudSun size={18} />
-        <h2>기상 Agent</h2>
+        <h2>기상 에이전트</h2>
       </div>
       <div className="metric-grid">
         <Metric label="위치" value={weather.locationName} />
@@ -24,7 +24,7 @@ export function WeatherPanel({ weather }: { weather: WeatherState }) {
         <Metric label="풍속" value={`${weather.windSpeed.toFixed(1)} m/s`} />
       </div>
       {weather.source === "fallback" ? (
-        <p className="panel-note warning-note">기상청 KIM 데이터를 사용할 수 없어 fallback 데이터를 사용합니다.</p>
+        <p className="panel-note warning-note">기상청 KIM 데이터를 사용할 수 없어 대체 기상 데이터를 사용합니다.</p>
       ) : null}
       <p className="panel-note">{weather.reason}</p>
       <p className="panel-note">{weather.agentNote}</p>

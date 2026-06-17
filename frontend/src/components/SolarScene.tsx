@@ -30,10 +30,10 @@ export function SolarScene({ state }: SolarSceneProps) {
         </div>
       </div>
       <div className="scene-stats">
-        <span>태양 방위각 {state.sunAzimuth.toFixed(1)}도</span>
-        <span>태양 고도각 {state.sunElevation.toFixed(1)}도</span>
-        <span>패널 방위각 {state.panelAzimuth.toFixed(1)}도</span>
-        <span>패널 고도각 {state.panelElevation.toFixed(1)}도</span>
+        <span>태양 방위각 {state.sunAzimuth.toFixed(1)}°</span>
+        <span>태양 고도각 {state.sunElevation.toFixed(1)}°</span>
+        <span>패널 방위각 {state.panelAzimuth.toFixed(1)}°</span>
+        <span>패널 고도각 {state.panelElevation.toFixed(1)}°</span>
       </div>
     </section>
   );

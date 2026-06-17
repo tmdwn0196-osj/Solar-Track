@@ -1,4 +1,10 @@
-﻿## 2026-06-17 11:52 KST - 승인된 KMA 8km API 경로 반영
+﻿## 2026-06-17 12:08 KST - 프론트 표시 문구 한글화
+
+- Changed: `UPDATE.md`, `backend/demo_report.py`, `backend/kma_kim_weather.py`, `backend/simulation.py`, `backend/vision_dataset.py`, `frontend/src/App.tsx`, `frontend/src/components/AgentPanel.tsx`, `frontend/src/components/ControlPanel.tsx`, `frontend/src/components/DashboardPanel.tsx`, `frontend/src/components/DemoReportPanel.tsx`, `frontend/src/components/LogPanel.tsx`, `frontend/src/components/ModelPanel.tsx`, `frontend/src/components/PowerChart.tsx`, `frontend/src/components/SensorPanel.tsx`, `frontend/src/components/SolarScene.tsx`, `frontend/src/components/VisionPanel.tsx`, `frontend/src/components/WeatherPanel.tsx`, `frontend/src/data/scenarios.ts`, `frontend/src/logic/reportModel.ts`, `frontend/src/logic/trackingAgent.ts`, `frontend/src/logic/visionModel.ts`, `frontend/src/logic/weatherModel.ts`
+- Actions: 프론트에 표시되는 깨진 한글, 영어 상태 문구, `Fallback`, `Agent`, `Class` 표기를 한글 문장으로 정리했다. 백엔드에서 프론트로 내려오는 기상, 시뮬레이션, 비전 데이터셋, 리포트 문구도 한글 응답으로 맞췄다.
+- Validation: `npm run build` passed; `uv run python -m py_compile main.py backend\__init__.py backend\app.py backend\models.py backend\simulation.py backend\agent_graph.py backend\vision_dataset.py backend\hardware_gateway.py backend\demo_report.py backend\kma_kim_weather.py` passed; frontend/backend source search found no mojibake patterns or remaining user-facing `Fallback`, `Weather is`, `Clear`, `Cloudy`, `Rain`, `Hot`, `Demo Report`, `Agent 진단`, `action=`, `risk=`, `powerGain=` strings.
+
+## 2026-06-17 11:52 KST - 승인된 KMA 8km API 경로 반영
 
 - Changed: `.env.example`, `UPDATE.md`, `backend/README.md`, `backend/kma_kim_weather.py`
 - Actions: 기존 `typ06` 지점 조회 API가 403을 반환하는 원인을 확인하고, 현재 인증키로 활용신청이 통과된 KIM 8km `typ01` 영역 조회 API(`nph-kim_nc_xy_txt2`, `KIMG/NE57/t2m/map=R`)로 백엔드 기상 어댑터를 전환했다. KMA가 최신 발표시각 파일을 아직 제공하지 않을 때 최근 6시간 주기를 순차 재시도하고, 한반도 영역 격자에서 선택 위치에 가장 가까운 온도값을 추출하도록 수정했다.

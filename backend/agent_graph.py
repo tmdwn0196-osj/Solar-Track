@@ -97,7 +97,7 @@ def safety_hold(graph_state: AgentGraphState) -> AgentGraphState:
         "panelAzimuth": state["panelAzimuth"],
         "panelElevation": state["panelElevation"],
         "phase": "hold",
-        "phaseReason": "Weather safety gate requested a tracking hold.",
+        "phaseReason": "기상 안전 게이트가 추적 보류를 요청했습니다.",
     }
     updated = recalculate_state({**state, **control})
     return {
@@ -120,7 +120,7 @@ def hold_servo(graph_state: AgentGraphState) -> AgentGraphState:
         "panelAzimuth": state["panelAzimuth"],
         "panelElevation": state["panelElevation"],
         "phase": "hold",
-        "phaseReason": "Cloud gate requested a servo hold to avoid unnecessary movement.",
+        "phaseReason": "구름 감지 게이트가 불필요한 모터 동작을 막기 위해 서보 보류를 요청했습니다.",
     }
     updated = recalculate_state({**state, **control})
     return {
@@ -133,9 +133,9 @@ def hold_servo(graph_state: AgentGraphState) -> AgentGraphState:
 def validate_sensor(graph_state: AgentGraphState) -> AgentGraphState:
     state = graph_state["state"]
     phase_reason = (
-        "Sensor values are usable for tracking."
+        "센서 값은 추적에 사용할 수 있습니다."
         if state["lightAverage"] >= 0.55
-        else "Light is low, but weather gate allowed a conservative validation pass."
+        else "광량은 낮지만 기상 게이트가 보수적인 검증을 허용했습니다."
     )
     updated = recalculate_state({**state, "phase": "weather_check", "phaseReason": phase_reason})
     return {"state": updated, "trace": append_trace(graph_state, "validate_sensor")}
@@ -193,14 +193,14 @@ def fuse_sensor_vision_weather(graph_state: AgentGraphState) -> AgentGraphState:
     reasons: list[str] = []
 
     if state["weather"]["trackingLimited"]:
-        reasons.append("Weather suggests tracking should be limited.")
+        reasons.append("기상 조건상 추적을 제한해야 합니다.")
     if state["vision"]["soilingDetected"] or state["vision"]["shadeDetected"]:
-        reasons.append("Vision suggests a panel-side output loss cause.")
+        reasons.append("비전 결과가 패널 측 출력 저하 원인을 나타냅니다.")
     if state["lightAverage"] < 0.55:
-        reasons.append("Light sensor average is low.")
+        reasons.append("조도 센서 평균값이 낮습니다.")
 
     if not reasons:
-        reasons.append("Sensor, vision, and weather signals are consistent enough for tracking.")
+        reasons.append("센서, 비전, 기상 신호가 추적 가능한 범위에서 일관됩니다.")
 
     fused = {
         **state,
@@ -225,8 +225,8 @@ def diagnose_fault(graph_state: AgentGraphState) -> AgentGraphState:
 def generate_report(graph_state: AgentGraphState) -> AgentGraphState:
     state = graph_state["state"]
     report = (
-        f"{state['diagnosis']} | action={state['action']} | "
-        f"risk={state['riskLevel']} | powerGain={state['powerGainRate']:.1f}%"
+        f"{state['diagnosis']} | 조치={state['action']} | "
+        f"위험도={state['riskLevel']} | 발전량 개선률={state['powerGainRate']:.1f}%"
     )
     return {
         "report": report,

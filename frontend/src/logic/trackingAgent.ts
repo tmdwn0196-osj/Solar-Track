@@ -39,7 +39,7 @@ export function runTrackingStep(state: SolarState): TrackingStep {
       azimuthError,
       elevationError,
       phase: "azimuth_align",
-      phaseReason: `하부 방위각 차이가 ${azimuthError.toFixed(1)}도라서 방위각을 먼저 정렬합니다.`,
+      phaseReason: `태양 방위각 차이가 ${azimuthError.toFixed(1)}°라서 방위각을 먼저 정렬합니다.`,
     };
   }
 
@@ -50,7 +50,7 @@ export function runTrackingStep(state: SolarState): TrackingStep {
       azimuthError,
       elevationError,
       phase: "elevation_align",
-      phaseReason: `방위각 정렬 후 상부 고도각 차이 ${elevationError.toFixed(1)}도를 보정합니다.`,
+      phaseReason: `방위각 정렬 후 남은 고도각 차이 ${elevationError.toFixed(1)}°를 보정합니다.`,
     };
   }
 

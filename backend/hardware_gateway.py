@@ -26,9 +26,9 @@ def get_hardware_profile() -> dict[str, Any]:
             "batteryVoltageMin": {"value": MIN_BATTERY_VOLTAGE, "unit": "V"},
         },
         "safety": [
-            "LLM never controls motors directly.",
-            "Backend validates all requested angles before returning a command.",
-            "Rain, high wind, overheating, low battery, and sensor faults force a hold command.",
+            "LLM은 모터를 직접 제어하지 않습니다.",
+            "백엔드는 명령을 반환하기 전에 모든 목표 각도를 검증합니다.",
+            "강수, 강풍, 과열, 저전압, 센서 이상이 있으면 보류 명령을 반환합니다.",
         ],
     }
 
@@ -73,21 +73,21 @@ def evaluate_safety(readings: dict[str, Any]) -> dict[str, Any]:
     reasons: list[str] = []
 
     if readings["emergencyStop"]:
-        reasons.append("Emergency stop input is active.")
+        reasons.append("비상 정지 입력이 활성화되었습니다.")
     if readings["rain"]:
-        reasons.append("Rain detected; hold motor movement.")
+        reasons.append("강수가 감지되어 모터 동작을 보류합니다.")
     if readings["windSpeed"] >= MAX_WIND_SPEED:
-        reasons.append("Wind speed exceeds motor movement limit.")
+        reasons.append("풍속이 모터 동작 제한값을 초과했습니다.")
     if readings["panelTemp"] >= MAX_PANEL_TEMP:
-        reasons.append("Panel temperature exceeds safe threshold.")
+        reasons.append("패널 온도가 안전 기준을 초과했습니다.")
     if readings["batteryVoltage"] <= MIN_BATTERY_VOLTAGE:
-        reasons.append("Battery voltage is too low for motor movement.")
+        reasons.append("배터리 전압이 모터 동작 기준보다 낮습니다.")
     if has_sensor_fault(readings):
-        reasons.append("One or more light sensor values are outside the expected range.")
+        reasons.append("하나 이상의 조도 센서 값이 예상 범위를 벗어났습니다.")
 
     return {
         "allowed": len(reasons) == 0,
-        "reasons": reasons or ["Telemetry passed safety checks."],
+        "reasons": reasons or ["텔레메트리가 안전 검사를 통과했습니다."],
     }
 
 
@@ -106,7 +106,7 @@ def build_hardware_command(readings: dict[str, Any], safety: dict[str, Any]) -> 
         "elevationTarget": readings["targetElevation"],
         "azimuthDelta": round(readings["targetAzimuth"] - readings["panelAzimuth"], 2),
         "elevationDelta": round(readings["targetElevation"] - readings["panelElevation"], 2),
-        "reason": "Backend safety gate approved the bounded target angles.",
+        "reason": "백엔드 안전 게이트가 제한 범위 내 목표 각도를 승인했습니다.",
     }
 
 

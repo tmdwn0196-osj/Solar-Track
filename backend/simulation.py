@@ -10,25 +10,25 @@ from backend.vision_dataset import build_virtual_vision_result
 LOCATIONS: dict[str, dict[str, Any]] = {
     "seoul": {
         "id": "seoul",
-        "name": "Seoul",
+        "name": "서울",
         "latitude": 37.5665,
         "longitude": 126.978,
     },
     "busan": {
         "id": "busan",
-        "name": "Busan",
+        "name": "부산",
         "latitude": 35.1796,
         "longitude": 129.0756,
     },
     "jeju": {
         "id": "jeju",
-        "name": "Jeju",
+        "name": "제주",
         "latitude": 33.4996,
         "longitude": 126.5312,
     },
     "daejeon": {
         "id": "daejeon",
-        "name": "Daejeon",
+        "name": "대전",
         "latitude": 36.3504,
         "longitude": 127.3845,
     },
@@ -81,7 +81,7 @@ def infer_vision(scenario: str) -> dict[str, Any]:
             "shadeDetected": False,
             **build_virtual_vision_result(
                 scenario,
-                "Cloud cover detected. Tracking correction is temporarily conservative.",
+                "구름으로 인한 일시적 광량 저하가 감지되었습니다.",
             ),
         }
     if scenario == "soiling":
@@ -91,7 +91,7 @@ def infer_vision(scenario: str) -> dict[str, Any]:
             "shadeDetected": False,
             **build_virtual_vision_result(
                 scenario,
-                "Possible dust or soiling detected on the panel surface.",
+                "패널 표면 오염 후보가 감지되었습니다.",
             ),
         }
     if scenario == "shade":
@@ -101,14 +101,14 @@ def infer_vision(scenario: str) -> dict[str, Any]:
             "shadeDetected": True,
             **build_virtual_vision_result(
                 scenario,
-                "Partial shading detected near the panel.",
+                "패널 주변 부분 음영 후보가 감지되었습니다.",
             ),
         }
     return {
         "cloudDetected": False,
         "soilingDetected": False,
         "shadeDetected": False,
-        **build_virtual_vision_result(scenario, "Vision inference is stable."),
+        **build_virtual_vision_result(scenario, "비전 감지 결과가 안정적입니다."),
     }
 
 
@@ -126,7 +126,7 @@ def simulate_step(state: dict[str, Any]) -> dict[str, Any]:
             "trackedPower": updated["trackedPower"],
         },
     ][-60:]
-    log_message = f"{format_time(updated['time'])} {updated.get('phaseReason') or 'State updated.'}"
+    log_message = f"{format_time(updated['time'])} {updated.get('phaseReason') or '상태를 갱신했습니다.'}"
 
     return {
         **updated,
@@ -209,14 +209,14 @@ def run_tracking_step(state: dict[str, Any]) -> dict[str, Any]:
             "panelElevation": state["panelElevation"],
             **errors,
             "phase": "idle",
-            "phaseReason": "Auto tracking is disabled. Holding the current panel angle.",
+            "phaseReason": "자동 추적이 꺼져 있어 현재 패널 각도를 유지합니다.",
         }
 
     if state["weather"]["trackingLimited"] or state["vision"]["cloudDetected"]:
         reason = (
-            "Weather conditions limit tracking. Motor correction is on hold."
+            "기상 조건으로 인해 추적을 보류합니다."
             if state["weather"]["trackingLimited"]
-            else "Vision detected cloud cover. Angle correction is on hold."
+            else "비전 결과에서 구름이 감지되어 각도 보정을 보류합니다."
         )
         return {
             "panelAzimuth": state["panelAzimuth"],
@@ -232,7 +232,7 @@ def run_tracking_step(state: dict[str, Any]) -> dict[str, Any]:
             "panelElevation": state["panelElevation"],
             **errors,
             "phase": "azimuth_align",
-            "phaseReason": f"Azimuth error is {azimuth_error:.1f} deg. Aligning azimuth first.",
+            "phaseReason": f"방위각 오차가 {azimuth_error:.1f}°라서 방위각을 먼저 정렬합니다.",
         }
 
     if abs(elevation_error) > 2:
@@ -241,7 +241,7 @@ def run_tracking_step(state: dict[str, Any]) -> dict[str, Any]:
             "panelElevation": clamp(state["panelElevation"] + (2 if elevation_error > 0 else -2), 0, 70),
             **errors,
             "phase": "elevation_align",
-            "phaseReason": f"Elevation error is {elevation_error:.1f} deg. Correcting elevation.",
+            "phaseReason": f"고도각 오차 {elevation_error:.1f}°를 보정합니다.",
         }
 
     return {
@@ -249,116 +249,116 @@ def run_tracking_step(state: dict[str, Any]) -> dict[str, Any]:
         "panelElevation": state["panelElevation"],
         **errors,
         "phase": "power_verify",
-        "phaseReason": "Panel angle is within tolerance. Verifying power gain.",
+        "phaseReason": "패널 각도가 허용 범위에 들어와 발전량 개선률을 검증합니다.",
     }
 
 
 def diagnose_state(state: dict[str, Any]) -> dict[str, Any]:
     if state["phase"] == "idle":
         return {
-            "diagnosis": "Simulation idle",
-            "action": "Start the loop to verify the solar tracking flow.",
+            "diagnosis": "시뮬레이션 대기",
+            "action": "시작 버튼을 눌러 태양 추적 흐름을 확인하세요.",
             "riskLevel": "normal",
-            "diagnosisReasons": ["The tracking loop has not run yet."],
+            "diagnosisReasons": ["아직 추적 루프가 실행되지 않았습니다."],
         }
     if state["scenario"] == "overheat" or state["panelTemp"] >= 65:
         return {
-            "diagnosis": "Panel overheating",
-            "action": "Limit tracking and inspect panel ventilation before continuing.",
+            "diagnosis": "패널 과열",
+            "action": "추적을 제한하고 패널 통풍 상태를 먼저 확인하세요.",
             "riskLevel": "danger",
             "diagnosisReasons": [
-                f"Panel temperature is {state['panelTemp']:.1f} C.",
-                "High temperature reduces efficiency and may require a safety hold.",
+                f"패널 온도 {state['panelTemp']:.1f} °C",
+                "고온은 효율 저하와 안전 보류 조건이 될 수 있습니다.",
             ],
         }
     if state["weather"]["trackingLimited"] or state["vision"]["cloudDetected"]:
         return {
-            "diagnosis": "Temporary output loss from weather",
-            "action": "Hold tracking while irradiance is unstable, then compare output again.",
+            "diagnosis": "기상 영향으로 인한 일시적 출력 저하",
+            "action": "광량이 불안정한 동안 추적을 보류하고, 이후 발전량을 다시 비교하세요.",
             "riskLevel": "warning",
             "diagnosisReasons": [
-                f"Cloud cover is {state['weather']['cloudCover']}%.",
-                "Vision or weather context indicates unstable irradiance.",
+                f"구름량 {state['weather']['cloudCover']}%",
+                "비전 또는 기상 정보가 불안정한 광량을 나타냅니다.",
             ],
         }
     if state["lightAverage"] < 0.55:
         return {
-            "diagnosis": "Low irradiance",
-            "action": "Wait for irradiance recovery before judging tracker performance.",
+            "diagnosis": "광량 부족",
+            "action": "광량이 회복된 뒤 추적 성능을 판단하세요.",
             "riskLevel": "warning",
             "diagnosisReasons": [
-                f"Average light sensor value is {state['lightAverage']:.2f}.",
-                "The sensor average is too low for reliable power comparison.",
+                f"평균 조도 {state['lightAverage']:.2f}",
+                "신뢰할 만한 발전량 비교를 하기에는 센서 평균값이 낮습니다.",
             ],
         }
     if state["phase"] == "power_verify" and state["powerGainRate"] >= 5:
         return {
-            "diagnosis": "Tracking correction succeeded",
-            "action": "Panel alignment improved output compared with the fixed panel.",
+            "diagnosis": "추적 보정 성공",
+            "action": "패널 정렬 후 고정식 대비 출력이 개선되었습니다.",
             "riskLevel": "normal",
             "diagnosisReasons": [
-                f"Power gain is {state['powerGainRate']:.1f}%.",
-                "Tracked output is at least 5% above fixed output.",
+                f"발전량 개선률 {state['powerGainRate']:.1f}%",
+                "추적식 출력이 고정식보다 5% 이상 높습니다.",
             ],
         }
     if state["vision"]["soilingDetected"] or state["scenario"] == "soiling":
         return {
-            "diagnosis": "Possible panel soiling",
-            "action": "Clean the panel surface and compare output under similar weather.",
+            "diagnosis": "패널 오염 의심",
+            "action": "패널 표면을 청소한 뒤 비슷한 기상 조건에서 출력을 다시 비교하세요.",
             "riskLevel": "warning",
             "diagnosisReasons": [
-                "Vision flagged possible surface soiling.",
-                f"Scenario factor is {state['powerBreakdown']['scenarioFactor']:.2f}.",
+                "비전 결과에서 표면 오염 후보가 감지되었습니다.",
+                f"시나리오 계수 {state['powerBreakdown']['scenarioFactor']:.2f}",
             ],
         }
     if state["vision"]["shadeDetected"] or state["scenario"] == "shade":
         return {
-            "diagnosis": "Possible partial shading",
-            "action": "Inspect surrounding structures and time-based shadow patterns.",
+            "diagnosis": "부분 음영 의심",
+            "action": "주변 구조물과 시간대별 그림자 패턴을 확인하세요.",
             "riskLevel": "warning",
             "diagnosisReasons": [
-                "Vision flagged possible partial shading.",
-                f"Average light sensor value is {state['lightAverage']:.2f}.",
+                "비전 결과에서 부분 음영 후보가 감지되었습니다.",
+                f"평균 조도 {state['lightAverage']:.2f}",
             ],
         }
     if state["scenario"] == "charging_issue":
         return {
-            "diagnosis": "Charging system issue",
-            "action": "Inspect the charge controller, battery connection, and wiring.",
+            "diagnosis": "충전 계통 문제",
+            "action": "충전 컨트롤러, 배터리 연결, 배선 상태를 점검하세요.",
             "riskLevel": "warning",
             "diagnosisReasons": [
-                f"Tracked power is {state['trackedPower']:.2f} W.",
-                f"Battery voltage is {state['batteryVoltage']:.1f} V.",
+                f"추적식 발전량 {state['trackedPower']:.2f} W",
+                f"배터리 전압 {state['batteryVoltage']:.1f} V",
             ],
         }
     if state["scenario"] == "overload":
         return {
-            "diagnosis": "Load exceeds expected output",
-            "action": "Reduce device load or inspect battery discharge state.",
+            "diagnosis": "부하 과다",
+            "action": "소비 전력을 줄이거나 배터리 방전 상태를 확인하세요.",
             "riskLevel": "warning",
             "diagnosisReasons": [
-                "The load is assumed to exceed current generation.",
-                f"Tracked power is {state['trackedPower']:.2f} W.",
+                "현재 발전량보다 부하가 큰 상황으로 가정됩니다.",
+                f"추적식 발전량 {state['trackedPower']:.2f} W",
             ],
         }
     if state["phase"] in {"azimuth_align", "elevation_align", "weather_check"}:
         return {
-            "diagnosis": "Sequential tracking in progress",
-            "action": "Continue azimuth and elevation alignment, then verify power.",
+            "diagnosis": "순차제어 진행 중",
+            "action": "방위각과 고도각 정렬을 계속한 뒤 발전량을 검증하세요.",
             "riskLevel": "normal",
             "diagnosisReasons": [
-                f"Azimuth error is {state['azimuthError']:.1f} deg.",
-                f"Elevation error is {state['elevationError']:.1f} deg.",
+                f"방위각 오차 {state['azimuthError']:.1f}°",
+                f"고도각 오차 {state['elevationError']:.1f}°",
             ],
         }
 
     return {
-        "diagnosis": "Tracking state under observation",
-        "action": "Keep the simulation running to gather more comparison data.",
+        "diagnosis": "추적 상태 확인 중",
+        "action": "시뮬레이션을 계속 실행해 비교 데이터를 더 수집하세요.",
         "riskLevel": "normal",
         "diagnosisReasons": [
-            f"Power gain is {state['powerGainRate']:.1f}%.",
-            "More simulation samples are required.",
+            f"발전량 개선률 {state['powerGainRate']:.1f}%",
+            "추가 시뮬레이션 샘플이 필요합니다.",
         ],
     }
 
@@ -483,35 +483,35 @@ def get_weather_factor(weather: dict[str, Any]) -> float:
 
 def get_weather_label(values: dict[str, Any]) -> str:
     if values["rain"]:
-        return "Rain"
+        return "비"
     if values["cloudCover"] >= 75:
-        return "Cloudy"
+        return "흐림"
     if values["temperature"] >= 34:
-        return "Hot"
+        return "고온"
     if values["cloudCover"] >= 45:
-        return "Partly cloudy"
-    return "Clear"
+        return "구름 많음"
+    return "맑음"
 
 
 def get_weather_reason(values: dict[str, Any], tracking_limited: bool) -> str:
     if values["rain"]:
-        return "Rain detected. Protecting equipment takes priority over tracking."
+        return "강수가 감지되어 추적보다 장비 보호를 우선합니다."
     if values["windSpeed"] >= 10:
-        return "Wind speed is high, so panel movement is limited."
+        return "풍속이 높아 패널 움직임을 제한합니다."
     if values["cloudCover"] >= 75:
-        return "Cloud cover is high and temporary output loss is expected."
+        return "구름량이 높아 일시적인 출력 저하가 예상됩니다."
     if values["temperature"] >= 34:
-        return "High ambient temperature may increase panel temperature."
+        return "높은 외기 온도가 패널 온도를 올릴 수 있습니다."
     if tracking_limited:
-        return "Weather is close to the tracking hold threshold."
-    return "Weather is stable enough for tracking."
+        return "기상 조건이 추적 보류 기준에 가깝습니다."
+    return "추적 가능한 안정적인 기상 조건입니다."
 
 
 def get_agent_note(source: str, location_name: str, scenario: str, tracking_limited: bool) -> str:
-    source_text = "scenario baseline" if source == "scenario" else source
-    decision = "holding motor correction" if tracking_limited else "allowing tracking correction"
-    scenario_text = " Scenario constraints are reflected." if scenario in {"cloudy", "overheat"} else ""
-    return f"{location_name} weather from {source_text}; agent is {decision}.{scenario_text}"
+    source_text = "시나리오 기준값" if source == "scenario" else source
+    decision = "모터 보정을 보류합니다" if tracking_limited else "추적 보정을 허용합니다"
+    scenario_text = " 시나리오 조건도 반영했습니다." if scenario in {"cloudy", "overheat"} else ""
+    return f"{location_name} 기상 데이터 출처는 {source_text}이며, 에이전트는 {decision}.{scenario_text}"
 
 
 def append_log(logs: list[str], message: str) -> list[str]:

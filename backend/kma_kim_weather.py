@@ -14,7 +14,7 @@ KMA_KIM_GRID_URL = "https://apihub.kma.go.kr/api/typ01/cgi-bin/url/nph-kim_nc_xy
 
 
 class KmaKimRequestError(RuntimeError):
-    """Raised when KMA API Hub rejects or cannot serve the KIM request."""
+    """KMA API Hub가 KIM 요청을 거부하거나 처리하지 못했을 때 사용한다."""
 
 
 def fetch_kma_kim_weather(scenario: str, location_id: str) -> dict[str, Any]:
@@ -37,8 +37,8 @@ def fetch_kma_kim_weather(scenario: str, location_id: str) -> dict[str, Any]:
             "source": "kma-kim",
             "collectedAt": kim_values["tmfc"],
             "agentNote": (
-                f"{location['name']} KMA API Hub KIM forecast data is used as "
-                "weather context. Scenario constraints are still applied for demo safety."
+                f"{location['name']} 위치의 기상청 API 허브 KIM 예측 데이터를 "
+                "기상 판단 보조 데이터로 사용합니다. 시연 안전을 위해 일부 시나리오 조건도 함께 적용합니다."
             ),
         }
     except KmaKimRequestError as exc:
@@ -111,9 +111,7 @@ def merge_kim_values(weather: dict[str, Any], kim_values: dict[str, Any]) -> dic
         "temperature": round(float(temperature), 1),
     }
     updated["trackingLimited"] = updated["rain"] or updated["cloudCover"] >= 75 or updated["windSpeed"] >= 10
-    updated["reason"] = (
-        "KMA KIM forecast temperature is reflected; cloud, rain, and wind use scenario fallback until variable codes are configured."
-    )
+    updated["reason"] = "기상청 KIM 예측 온도를 반영했습니다. 구름, 강수, 풍속은 변수 설정 전까지 시나리오 값을 함께 사용합니다."
     return updated
 
 
@@ -157,9 +155,9 @@ def with_fallback_note(scenario: str, location_id: str, note: str) -> dict[str, 
     weather = calculate_weather(scenario, location_id, source="fallback")
     return {
         **weather,
-        "reason": f"{weather['reason']} {note} KMA KIM 데이터를 사용할 수 없어 fallback 데이터를 사용합니다.",
-        "collectedAt": "fallback 데이터 사용",
-        "agentNote": f"{weather['locationName']} KMA KIM fallback: {note}",
+        "reason": f"{weather['reason']} {note} KMA KIM 데이터를 사용할 수 없어 대체 기상 데이터를 사용합니다.",
+        "collectedAt": "대체 기상 데이터 사용",
+        "agentNote": f"{weather['locationName']} KMA KIM 대체 데이터 사용: {note}",
     }
 
 

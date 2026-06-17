@@ -59,10 +59,7 @@ export function ControlPanel({
 
       <div className="control-group">
         <span>시나리오</span>
-        <select
-          value={scenario}
-          onChange={(event) => onScenarioChange(event.target.value as Scenario)}
-        >
+        <select value={scenario} onChange={(event) => onScenarioChange(event.target.value as Scenario)}>
           {scenarios.map((item) => (
             <option key={item.value} value={item.value}>
               {item.label}
@@ -74,10 +71,7 @@ export function ControlPanel({
 
       <div className="control-group">
         <span>기상 위치</span>
-        <select
-          value={weatherLocationId}
-          onChange={(event) => onWeatherLocationChange(event.target.value)}
-        >
+        <select value={weatherLocationId} onChange={(event) => onWeatherLocationChange(event.target.value)}>
           {weatherLocations.map((location) => (
             <option key={location.id} value={location.id}>
               {location.name}

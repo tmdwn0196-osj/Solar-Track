@@ -9,7 +9,7 @@ export function DemoReportPanel({ state }: { state: SolarState }) {
     <section className="panel">
       <div className="panel-heading">
         <FileText size={18} />
-        <h2>Demo Report</h2>
+        <h2>시연 리포트</h2>
       </div>
       <p className="panel-note">{report.summary}</p>
       <dl className="agent-list">

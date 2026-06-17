@@ -239,15 +239,14 @@ function App() {
   }, [state.running]);
 
   function updateScenario(scenario: Scenario) {
-    setState((previous) => {
-      const next = recalculateState({
+    setState((previous) =>
+      recalculateState({
         ...previous,
         scenario,
         phase: "weather_check",
         logs: appendLog(previous.logs, `${formatTime(previous.time)} 시나리오를 변경했습니다.`),
-      });
-      return next;
-    });
+      }),
+    );
   }
 
   function updateWeatherLocation(locationId: string) {
@@ -262,25 +261,24 @@ function App() {
   }
 
   function adjustPanel(field: "azimuth" | "elevation", amount: number) {
-    setState((previous) => {
-      const next = recalculateState({
+    setState((previous) =>
+      recalculateState({
         ...previous,
         panelAzimuth:
           field === "azimuth" ? clamp(previous.panelAzimuth + amount, -90, 90) : previous.panelAzimuth,
         panelElevation:
           field === "elevation" ? clamp(previous.panelElevation + amount, 0, 70) : previous.panelElevation,
         logs: appendLog(previous.logs, `${formatTime(previous.time)} 수동으로 ${field === "azimuth" ? "방위각" : "고도각"}을 조정했습니다.`),
-      });
-      return next;
-    });
+      }),
+    );
   }
 
   return (
     <main className="app-shell">
       <header className="topbar">
         <div>
-          <p className="eyebrow">v11 Demo Scenario Report</p>
-          <h1>SolarTrack Agent</h1>
+          <p className="eyebrow">v11 시연 시나리오 리포트</p>
+          <h1>SolarTrack 에이전트</h1>
         </div>
         <div className="status-strip">
           <span>{currentScenario?.label}</span>

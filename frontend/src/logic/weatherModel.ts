@@ -28,7 +28,7 @@ export function calculateWeather(
     scenario,
     location,
     source,
-    collectedAt: source === "fallback" ? "fallback 데이터 사용" : "시나리오 기준",
+    collectedAt: source === "fallback" ? "대체 기상 데이터 사용" : "시나리오 기준",
   });
 }
 
@@ -85,7 +85,7 @@ function getWeatherLabel(values: WeatherValues) {
 }
 
 function getWeatherReason(values: WeatherValues, trackingLimited: boolean) {
-  if (values.rain) return "강수가 감지되어 발전량 저하와 장비 보호 판단이 필요합니다.";
+  if (values.rain) return "강수가 감지되어 발전기와 장비 보호를 위해 추적을 보류합니다.";
   if (values.windSpeed >= 10) return "풍속이 높아 패널 각도 변경을 보수적으로 판단합니다.";
   if (values.cloudCover >= 75) return "구름량이 높아 일시적인 출력 저하 가능성이 큽니다.";
   if (values.temperature >= 34) return "기온이 높아 패널 온도 상승과 효율 저하를 함께 확인합니다.";
@@ -103,11 +103,11 @@ function getAgentNote(
     source === "kma-kim"
       ? "기상청 API 허브 KIM 예측"
       : source === "fallback"
-        ? "fallback 데이터"
+        ? "대체 기상 데이터"
         : "시나리오 기준값";
-  const decision = trackingLimited ? "모터 보정을 보류 후보로 표시합니다." : "추적 보정을 계속 허용합니다.";
-  const scenarioText = scenario === "cloudy" || scenario === "overheat" ? " 시나리오 조건을 함께 반영했습니다." : "";
-  const fallbackText = source === "fallback" ? " 기상청 KIM 데이터를 사용할 수 없어 fallback 데이터를 사용합니다." : "";
+  const decision = trackingLimited ? "모터 보정은 보류 후보로 표시합니다." : "추적 보정을 계속 허용합니다.";
+  const scenarioText = scenario === "cloudy" || scenario === "overheat" ? " 시나리오 조건도 함께 반영했습니다." : "";
+  const fallbackText = source === "fallback" ? " 기상청 KIM 데이터를 사용할 수 없어 대체 기상 데이터를 사용합니다." : "";
 
-  return `${location.name} 위치의 ${sourceText}을 Agent 판단 보조 데이터로 사용합니다.${fallbackText} ${decision}${scenarioText}`;
+  return `${location.name} 위치의 ${sourceText}을 에이전트 판단 보조 데이터로 사용합니다.${fallbackText} ${decision}${scenarioText}`;
 }

@@ -22,7 +22,7 @@ export function AgentPanel({ state }: { state: SolarState }) {
     <section className={`panel agent-panel risk-${state.riskLevel}`}>
       <div className="panel-heading">
         <Bot size={18} />
-        <h2>Agent</h2>
+        <h2>에이전트</h2>
         <span className={`risk-badge risk-badge-${state.riskLevel}`}>{riskLabels[state.riskLevel]}</span>
       </div>
       <dl className="agent-list">
@@ -37,7 +37,7 @@ export function AgentPanel({ state }: { state: SolarState }) {
         <div>
           <dt>정렬 오차</dt>
           <dd>
-            방위각 {state.azimuthError.toFixed(1)}도, 고도각 {state.elevationError.toFixed(1)}도
+            방위각 {state.azimuthError.toFixed(1)}°, 고도각 {state.elevationError.toFixed(1)}°
           </dd>
         </div>
         <div>

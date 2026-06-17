@@ -7,7 +7,7 @@ const scenarioVisionMap: Record<
   normal: {
     primaryClass: "panel_clean",
     confidence: 0.91,
-    modelMode: "virtual_dataset_stub",
+    modelMode: "가상 데이터셋",
     detections: [
       { className: "sky_clear", confidence: 0.88 },
       { className: "panel_clean", confidence: 0.91 },
@@ -16,7 +16,7 @@ const scenarioVisionMap: Record<
   cloudy: {
     primaryClass: "sun_cloud_block",
     confidence: 0.86,
-    modelMode: "virtual_dataset_stub",
+    modelMode: "가상 데이터셋",
     detections: [
       { className: "sky_cloudy", confidence: 0.84 },
       { className: "sun_cloud_block", confidence: 0.86 },
@@ -25,19 +25,19 @@ const scenarioVisionMap: Record<
   shade: {
     primaryClass: "panel_partial_shadow",
     confidence: 0.82,
-    modelMode: "virtual_dataset_stub",
+    modelMode: "가상 데이터셋",
     detections: [{ className: "panel_partial_shadow", confidence: 0.82 }],
   },
   soiling: {
     primaryClass: "panel_soiling",
     confidence: 0.8,
-    modelMode: "virtual_dataset_stub",
+    modelMode: "가상 데이터셋",
     detections: [{ className: "panel_soiling", confidence: 0.8 }],
   },
   overheat: {
     primaryClass: "panel_clean",
     confidence: 0.74,
-    modelMode: "virtual_dataset_stub",
+    modelMode: "가상 데이터셋",
     detections: [
       { className: "sky_clear", confidence: 0.79 },
       { className: "panel_clean", confidence: 0.74 },
@@ -46,13 +46,13 @@ const scenarioVisionMap: Record<
   charging_issue: {
     primaryClass: "panel_clean",
     confidence: 0.78,
-    modelMode: "virtual_dataset_stub",
+    modelMode: "가상 데이터셋",
     detections: [{ className: "panel_clean", confidence: 0.78 }],
   },
   overload: {
     primaryClass: "panel_clean",
     confidence: 0.77,
-    modelMode: "virtual_dataset_stub",
+    modelMode: "가상 데이터셋",
     detections: [{ className: "panel_clean", confidence: 0.77 }],
   },
 };
@@ -64,7 +64,7 @@ export function inferVirtualVision(scenario: Scenario): VisionState {
       soilingDetected: false,
       shadeDetected: false,
       ...scenarioVisionMap[scenario],
-      note: "구름에 의한 일시적 광량 저하가 감지되었습니다.",
+      note: "구름으로 인한 일시적 광량 저하가 감지되었습니다.",
     };
   }
 

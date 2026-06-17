@@ -3,11 +3,12 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from backend.agent_graph import run_agent_graph
 from backend.models import ControlCommandRequest, StateRequest, VisionInferRequest, WeatherContextRequest
 from backend.simulation import calculate_weather, diagnose_state, infer_vision, recalculate_state, run_tracking_step, simulate_step
 
 
-app = FastAPI(title="SolarTrack Agent API", version="0.7.0")
+app = FastAPI(title="SolarTrack Agent API", version="0.8.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -25,7 +26,7 @@ app.add_middleware(
 
 @app.get("/api/health")
 def health() -> dict[str, str]:
-    return {"status": "ok", "service": "solartrack-backend", "version": "0.7.0"}
+    return {"status": "ok", "service": "solartrack-backend", "version": "0.8.0"}
 
 
 @app.post("/api/simulate/step")
@@ -69,3 +70,8 @@ def control_command(request: ControlCommandRequest) -> dict[str, object]:
             },
         }
     return {"accepted": True, "command": request.command, "control": run_tracking_step(request.state)}
+
+
+@app.post("/api/agent/evaluate")
+def agent_evaluate(request: StateRequest) -> dict[str, object]:
+    return {"agent": run_agent_graph(request.state)}

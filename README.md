@@ -45,4 +45,4 @@ React Web Simulator
 
 ## 현재 진행 단계
 
-현재 단계: v07 FastAPI 백엔드 분리
+현재 단계: v08 LangGraph Agent 구조

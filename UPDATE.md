@@ -1,3 +1,9 @@
+## 2026-06-17 10:11 KST - v08 LangGraph Agent 구조
+
+- Changed: `pyproject.toml`, `uv.lock`, `backend/agent_graph.py`, `backend/app.py`, `backend/README.md`, `docs/v08_langgraph_agent_plan.md`, `README.md`
+- Actions: LangGraph `StateGraph` 기반 Agent 흐름을 추가하고 센서, 기상, 비전, 안전 분기, 추적 정렬, 발전량 검증, 진단, 리포트 생성 노드를 규칙 기반으로 구성했다. `/api/agent/evaluate` 엔드포인트를 추가해 현재 SolarState를 그래프에 전달하고 trace와 진단 결과를 받을 수 있게 했다.
+- Validation: `uv sync` installed LangGraph dependencies; `uv run python -m py_compile main.py backend\__init__.py backend\app.py backend\models.py backend\simulation.py backend\agent_graph.py` passed; `uv run python main.py` printed `Hello from solar-track!`; `npm run build` passed; FastAPI TestClient calls for `/api/agent/evaluate` normal and cloudy paths passed; temporary `uvicorn` server returned `/api/health` successfully.
+
 ## 2026-06-17 10:03 KST - v07 FastAPI 백엔드 분리
 
 - Changed: `pyproject.toml`, `uv.lock`, `backend/__init__.py`, `backend/app.py`, `backend/models.py`, `backend/simulation.py`, `backend/README.md`, `frontend/README.md`, `frontend/src/App.tsx`, `frontend/src/logic/apiClient.ts`, `README.md`

@@ -48,3 +48,18 @@ LLM은 진단 설명, 사용자용 리포트, 질의응답에 사용한다.
 ## 9. LLM을 사용하지 말아야 할 위치
 
 모터 제어, 각도 제한, 위험 정지, 실시간 센서 루프에는 사용하지 않는다.
+
+## 10. v08 구현 상태
+
+현재 구현은 `backend/agent_graph.py`에 LangGraph `StateGraph`로 구성되어 있다.
+
+| 항목 | 구현 내용 |
+|---|---|
+| API | `POST /api/agent/evaluate` |
+| 그래프 입력 | 현재 `SolarState` JSON |
+| 그래프 출력 | 갱신 상태, 센서 스냅샷, 기상, 비전, 제어 결과, 진단, 리포트, 노드 trace |
+| 분기 | `weather_gate`, `cloud_gate` |
+| 안전 보류 | `safety_hold`, `hold_servo` |
+| LLM 사용 | 아직 사용하지 않음 |
+
+초기 목적은 Agent 흐름을 상태 그래프로 분리하는 것이다. 실제 LLM은 이후 리포트 설명이나 사용자 질의응답에만 붙인다.

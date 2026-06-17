@@ -10,6 +10,30 @@ SolarTrack Agent의 FastAPI 백엔드다.
 - `POST /api/diagnosis`: 상태 재계산 후 진단 결과 반환
 - `POST /api/vision/infer`: 시나리오 기반 가상 비전 추론
 - `POST /api/control/command`: 추적/홀드 제어 명령 검증
+- `POST /api/agent/evaluate`: LangGraph 기반 Agent 상태 그래프 실행
+
+## LangGraph Agent 흐름
+
+초기 v08 구현은 LLM 없이 규칙 기반 노드만 사용한다.
+
+```text
+collect_sensor
+-> collect_weather
+-> vision_inference
+-> weather_gate
+-> cloud_gate 또는 safety_hold
+-> validate_sensor 또는 hold_servo
+-> measure_before_power
+-> azimuth_align
+-> elevation_align
+-> measure_after_power
+-> verify_power_gain
+-> fuse_sensor_vision_weather
+-> diagnose_fault
+-> generate_report
+```
+
+강수, 강풍, 높은 구름량, 비전 구름 감지는 모터 보류 경로로 분기한다. 모터 제어 판단은 LLM이 아니라 규칙 기반 함수가 수행한다.
 
 ## 실행
 

@@ -1,4 +1,10 @@
-﻿## 2026-06-17 11:36 KST - KMA fallback 원인 재검토
+﻿## 2026-06-17 11:52 KST - 승인된 KMA 8km API 경로 반영
+
+- Changed: `.env.example`, `UPDATE.md`, `backend/README.md`, `backend/kma_kim_weather.py`
+- Actions: 기존 `typ06` 지점 조회 API가 403을 반환하는 원인을 확인하고, 현재 인증키로 활용신청이 통과된 KIM 8km `typ01` 영역 조회 API(`nph-kim_nc_xy_txt2`, `KIMG/NE57/t2m/map=R`)로 백엔드 기상 어댑터를 전환했다. KMA가 최신 발표시각 파일을 아직 제공하지 않을 때 최근 6시간 주기를 순차 재시도하고, 한반도 영역 격자에서 선택 위치에 가장 가까운 온도값을 추출하도록 수정했다.
+- Validation: `uv run python -m py_compile main.py backend\__init__.py backend\app.py backend\models.py backend\simulation.py backend\agent_graph.py backend\vision_dataset.py backend\hardware_gateway.py backend\demo_report.py backend\kma_kim_weather.py` passed; `npm run build` passed; FastAPI TestClient call for `/api/weather/context` returned `source=kma-kim`, `collectedAt=2026061700`, and KMA-derived temperature `17.2`.
+
+## 2026-06-17 11:36 KST - KMA fallback 원인 재검토
 
 - Changed: `UPDATE.md`, `backend/README.md`, `backend/kma_kim_weather.py`
 - Actions: KMA API Hub KIM 호출을 실제 `.env` 로드 경로로 재검증했고, 현재 fallback 원인이 `403 활용신청이 필요한 API 입니다` 응답임을 확인했다. 백엔드가 httpx 예외 문자열을 그대로 반환하지 않고 KMA 응답의 상태/메시지만 추출하도록 변경해 인증키가 응답에 노출되지 않게 했다.

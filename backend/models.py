@@ -32,3 +32,22 @@ class StateRequest(BaseModel):
 class ControlCommandRequest(BaseModel):
     state: dict[str, Any]
     command: Literal["track_step", "hold", "validate"]
+
+
+class HardwareTelemetryRequest(BaseModel):
+    deviceId: str = Field(default="esp32-demo")
+    leftLight: float
+    rightLight: float
+    topLight: float
+    bottomLight: float
+    voltage: float
+    current: float
+    panelTemp: float
+    batteryVoltage: float
+    panelAzimuth: float
+    panelElevation: float
+    targetAzimuth: float
+    targetElevation: float
+    rain: bool = Field(default=False)
+    windSpeed: float = Field(default=0)
+    emergencyStop: bool = Field(default=False)

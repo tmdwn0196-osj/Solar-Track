@@ -1,3 +1,9 @@
+## 2026-06-17 10:21 KST - v10 ESP32 하드웨어 게이트웨이 준비
+
+- Changed: `README.md`, `UPDATE.md`, `backend/app.py`, `backend/models.py`, `backend/hardware_gateway.py`, `backend/README.md`, `docs/v10_esp32_hardware_plan.md`, `hardware/README.md`, `hardware/esp32_solartrack_gateway/esp32_solartrack_gateway.ino`
+- Actions: ESP32 하드웨어 프로필과 텔레메트리 검증 API를 추가하고, 비/강풍/과열/저전압/센서 이상/emergency stop 조건에서 `hold` 명령을 반환하는 안전 게이트를 구현했다. 실제 모터 제어 전 통신 계약을 확인할 수 있는 ESP32 예제 스케치를 추가했다.
+- Validation: `uv run python -m py_compile main.py backend\__init__.py backend\app.py backend\models.py backend\simulation.py backend\agent_graph.py backend\vision_dataset.py backend\hardware_gateway.py` passed; `uv run python main.py` printed `Hello from solar-track!`; `npm run build` passed; FastAPI TestClient calls for `/api/hardware/profile` and `/api/hardware/telemetry` move/hold paths passed; temporary `uvicorn` server returned `/api/health` successfully.
+
 ## 2026-06-17 10:16 KST - v09 데이터셋 및 비전모델 학습 준비
 
 - Changed: `README.md`, `UPDATE.md`, `backend/app.py`, `backend/simulation.py`, `backend/vision_dataset.py`, `backend/README.md`, `docs/v09_dataset_vision_training_plan.md`, `datasets/README.md`, `datasets/sample_manifest.csv`, `datasets/images/`, `datasets/labels/`, `frontend/README.md`, `frontend/src/App.tsx`, `frontend/src/components/VisionPanel.tsx`, `frontend/src/logic/visionModel.ts`, `frontend/src/styles.css`, `frontend/src/types/solar.ts`

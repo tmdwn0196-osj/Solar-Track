@@ -1,4 +1,10 @@
-﻿## 2026-06-17 17:48 KST - 기상 모드 선택 추가
+﻿## 2026-06-17 17:58 KST - KIM 기상 변수 확장
+
+- Changed: `.env.example`, `UPDATE.md`, `backend/kma_kim_weather.py`, `backend/simulation.py`, `frontend/src/components/WeatherPanel.tsx`, `frontend/src/logic/weatherModel.ts`, `frontend/src/types/solar.ts`
+- Actions: KIM 모드에서 `t2m` 온도뿐 아니라 `ws` 풍속과 `rh2m` 상대습도를 함께 반영하도록 확장했다. 기상 응답에 `valueSources`를 추가해 온도/풍속/습도는 KIM, 구름량/강수는 시나리오 기반임을 프론트 기상 패널에 표시하도록 했다.
+- Validation: `npm run build` passed; `uv run python -m py_compile main.py backend\__init__.py backend\app.py backend\models.py backend\simulation.py backend\agent_graph.py backend\vision_dataset.py backend\hardware_gateway.py backend\demo_report.py backend\kma_kim_weather.py` passed; FastAPI TestClient calls for `/api/weather/context` returned `mode=scenario -> temperature=25, windSpeed=2.1, humidity=None, valueSources=scenario` and `mode=kma-kim -> temperature=17.2, windSpeed=1.6, humidity=64.8, valueSources temperature/windSpeed/humidity=kma-kim, cloudCover/rain=scenario`.
+
+## 2026-06-17 17:48 KST - 기상 모드 선택 추가
 
 - Changed: `UPDATE.md`, `backend/app.py`, `backend/models.py`, `frontend/src/App.tsx`, `frontend/src/components/ControlPanel.tsx`, `frontend/src/logic/apiClient.ts`, `frontend/src/types/solar.ts`
 - Actions: 기상 컨텍스트를 `시나리오 기반` 모드와 `기상청 KIM` 모드로 명시적으로 분리했다. 프론트 제어 패널에 기상 모드 선택 UI를 추가하고, 백엔드 `/api/weather/context`가 `mode=scenario`이면 외부 API 없이 시나리오 기상값을 반환하고 `mode=kma-kim`이면 KIM API 값을 우선 반영하도록 변경했다.

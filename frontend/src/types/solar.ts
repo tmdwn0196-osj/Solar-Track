@@ -20,6 +20,14 @@ export type WeatherLocation = {
   note: string;
 };
 
+export type WeatherValueSources = {
+  temperature: WeatherSource;
+  windSpeed: WeatherSource;
+  humidity?: WeatherSource;
+  cloudCover: WeatherSource;
+  rain: WeatherSource;
+};
+
 export type AgentPhase =
   | "idle"
   | "weather_check"
@@ -34,6 +42,7 @@ export type WeatherState = {
   cloudCover: number;
   rain: boolean;
   temperature: number;
+  humidity?: number;
   windSpeed: number;
   trackingLimited: boolean;
   reason: string;
@@ -41,6 +50,7 @@ export type WeatherState = {
   source: WeatherSource;
   collectedAt: string;
   agentNote: string;
+  valueSources?: WeatherValueSources;
 };
 
 export type VisionState = {

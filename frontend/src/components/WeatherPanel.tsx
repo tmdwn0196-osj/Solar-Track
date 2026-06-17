@@ -8,6 +8,12 @@ const sourceLabels: Record<WeatherState["source"], string> = {
   fallback: "대체 기상 데이터",
 };
 
+const valueSourceLabels: Record<WeatherState["source"], string> = {
+  scenario: "시나리오",
+  "kma-kim": "KIM",
+  fallback: "대체",
+};
+
 export function WeatherPanel({ weather }: { weather: WeatherState }) {
   return (
     <section className="panel">
@@ -22,13 +28,26 @@ export function WeatherPanel({ weather }: { weather: WeatherState }) {
         <Metric label="구름량" value={`${weather.cloudCover}%`} />
         <Metric label="강수" value={weather.rain ? "있음" : "없음"} tone={weather.rain ? "warn" : "default"} />
         <Metric label="풍속" value={`${weather.windSpeed.toFixed(1)} m/s`} />
+        {weather.humidity !== undefined ? <Metric label="습도" value={`${weather.humidity.toFixed(1)}%`} /> : null}
       </div>
       {weather.source === "fallback" ? (
         <p className="panel-note warning-note">기상청 KIM 데이터를 사용할 수 없어 대체 기상 데이터를 사용합니다.</p>
       ) : null}
       <p className="panel-note">{weather.reason}</p>
       <p className="panel-note">{weather.agentNote}</p>
+      {weather.valueSources ? (
+        <p className="panel-note">
+          값 출처: 온도 {formatValueSource(weather.valueSources.temperature)}, 풍속{" "}
+          {formatValueSource(weather.valueSources.windSpeed)}
+          {weather.valueSources.humidity ? `, 습도 ${formatValueSource(weather.valueSources.humidity)}` : ""}, 구름량{" "}
+          {formatValueSource(weather.valueSources.cloudCover)}, 강수 {formatValueSource(weather.valueSources.rain)}
+        </p>
+      ) : null}
       <p className="panel-note">수집 시각: {weather.collectedAt}</p>
     </section>
   );
+}
+
+function formatValueSource(source: WeatherState["source"]) {
+  return valueSourceLabels[source];
 }

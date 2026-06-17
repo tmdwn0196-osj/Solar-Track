@@ -63,6 +63,7 @@ def calculate_weather(scenario: str, location_id: str = "seoul", source: str = "
         "cloudCover": round(values["cloudCover"]),
         "rain": values["rain"],
         "temperature": round(values["temperature"], 1),
+        "humidity": round(values["humidity"], 1) if "humidity" in values else None,
         "windSpeed": round(values["windSpeed"], 1),
         "trackingLimited": tracking_limited,
         "reason": get_weather_reason(values, tracking_limited),
@@ -70,6 +71,13 @@ def calculate_weather(scenario: str, location_id: str = "seoul", source: str = "
         "source": source,
         "collectedAt": datetime.now(timezone.utc).isoformat(),
         "agentNote": get_agent_note(source, location["name"], scenario, tracking_limited),
+        "valueSources": {
+            "temperature": source,
+            "windSpeed": source,
+            "humidity": source if "humidity" in values else None,
+            "cloudCover": source,
+            "rain": source,
+        },
     }
 
 

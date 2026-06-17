@@ -5,6 +5,7 @@ type WeatherValues = {
   cloudCover: number;
   rain: boolean;
   temperature: number;
+  humidity?: number;
   windSpeed: number;
 };
 
@@ -54,6 +55,7 @@ function buildWeatherState({
     cloudCover: Math.round(adjustedValues.cloudCover),
     rain: adjustedValues.rain,
     temperature: Number(adjustedValues.temperature.toFixed(1)),
+    humidity: adjustedValues.humidity === undefined ? undefined : Number(adjustedValues.humidity.toFixed(1)),
     windSpeed: Number(adjustedValues.windSpeed.toFixed(1)),
     trackingLimited,
     reason: getWeatherReason(adjustedValues, trackingLimited),
@@ -61,6 +63,13 @@ function buildWeatherState({
     source,
     collectedAt,
     agentNote: getAgentNote(source, location, scenario, trackingLimited),
+    valueSources: {
+      temperature: source,
+      windSpeed: source,
+      humidity: adjustedValues.humidity === undefined ? undefined : source,
+      cloudCover: source,
+      rain: source,
+    },
   };
 }
 

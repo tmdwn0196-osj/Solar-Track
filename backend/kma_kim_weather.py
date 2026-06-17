@@ -61,32 +61,52 @@ def request_kim_values(location: dict[str, Any], auth_key: str) -> dict[str, Any
     level = os.getenv("KMA_KIM_LEVEL", "0")
     group = os.getenv("KMA_KIM_GROUP", "KIMG")
     nwp = os.getenv("KMA_KIM_NWP", "NE57")
-    data = os.getenv("KMA_KIM_DATA", "U")
-    name = os.getenv("KMA_KIM_NAME", "t2m")
     kim_map = os.getenv("KMA_KIM_MAP", "R")
 
     last_error: Exception | None = None
     tmfc_values = [tmfc_override] if tmfc_override else recent_tmfc_utc_values()
     for tmfc in tmfc_values:
-        params = {
-            "group": group,
-            "nwp": nwp,
-            "data": data,
-            "name": name,
-            "map": kim_map,
-            "tmfc": tmfc,
-            "hf": hf,
-            "level": level,
-            "disp": "A",
-            "help": "0",
-            "authKey": auth_key,
-        }
-
         try:
             with httpx.Client(timeout=12) as client:
-                response = client.get(KMA_KIM_GRID_URL, params=params)
-            ensure_kma_success(response)
-            value = parse_grid_value(response.text, location)
+                temperature = fetch_grid_variable(
+                    client,
+                    auth_key,
+                    location,
+                    group=group,
+                    nwp=nwp,
+                    data=os.getenv("KMA_KIM_TEMPERATURE_DATA", "U"),
+                    name=os.getenv("KMA_KIM_TEMPERATURE_NAME", "t2m"),
+                    level=os.getenv("KMA_KIM_TEMPERATURE_LEVEL", level),
+                    kim_map=kim_map,
+                    tmfc=tmfc,
+                    hf=hf,
+                )
+                wind_speed = fetch_grid_variable(
+                    client,
+                    auth_key,
+                    location,
+                    group=group,
+                    nwp=nwp,
+                    data=os.getenv("KMA_KIM_WIND_DATA", "U"),
+                    name=os.getenv("KMA_KIM_WIND_NAME", "ws"),
+                    level=os.getenv("KMA_KIM_WIND_LEVEL", level),
+                    kim_map=kim_map,
+                    tmfc=tmfc,
+                    hf=hf,
+                )
+                humidity = fetch_optional_grid_variable(
+                    client,
+                    auth_key,
+                    location,
+                    group=group,
+                    nwp=nwp,
+                    data=os.getenv("KMA_KIM_HUMIDITY_DATA", "U"),
+                    name=os.getenv("KMA_KIM_HUMIDITY_NAME", "rh2m"),
+                    level=os.getenv("KMA_KIM_HUMIDITY_LEVEL", level),
+                    kim_map=kim_map,
+                    tmfc=tmfc,
+                    hf=hf,
+                )
             break
         except ValueError as exc:
             last_error = exc
@@ -96,9 +116,55 @@ def request_kim_values(location: dict[str, Any], auth_key: str) -> dict[str, Any
     return {
         "tmfc": tmfc,
         "hf": hf,
-        "rawValues": [value],
-        "temperature": normalize_temperature(value),
+        "rawValues": [temperature, wind_speed],
+        "temperature": normalize_temperature(temperature),
+        "windSpeed": wind_speed,
+        "humidity": humidity,
     }
+
+
+def fetch_grid_variable(
+    client: httpx.Client,
+    auth_key: str,
+    location: dict[str, Any],
+    *,
+    group: str,
+    nwp: str,
+    data: str,
+    name: str,
+    level: str,
+    kim_map: str,
+    tmfc: str,
+    hf: str,
+) -> float:
+    params = {
+        "group": group,
+        "nwp": nwp,
+        "data": data,
+        "name": name,
+        "map": kim_map,
+        "tmfc": tmfc,
+        "hf": hf,
+        "level": level,
+        "disp": "A",
+        "help": "0",
+        "authKey": auth_key,
+    }
+    response = client.get(KMA_KIM_GRID_URL, params=params)
+    ensure_kma_success(response)
+    return parse_grid_value(response.text, location)
+
+
+def fetch_optional_grid_variable(
+    client: httpx.Client,
+    auth_key: str,
+    location: dict[str, Any],
+    **kwargs: str,
+) -> float | None:
+    try:
+        return fetch_grid_variable(client, auth_key, location, **kwargs)
+    except ValueError:
+        return None
 
 
 def merge_kim_values(weather: dict[str, Any], kim_values: dict[str, Any]) -> dict[str, Any]:
@@ -110,8 +176,19 @@ def merge_kim_values(weather: dict[str, Any], kim_values: dict[str, Any]) -> dic
         **weather,
         "temperature": round(float(temperature), 1),
     }
+    if kim_values.get("windSpeed") is not None:
+        updated["windSpeed"] = round(float(kim_values["windSpeed"]), 1)
+    if kim_values.get("humidity") is not None:
+        updated["humidity"] = round(float(kim_values["humidity"]), 1)
     updated["trackingLimited"] = updated["rain"] or updated["cloudCover"] >= 75 or updated["windSpeed"] >= 10
-    updated["reason"] = "기상청 KIM 예측 온도를 반영했습니다. 구름, 강수, 풍속은 변수 설정 전까지 시나리오 값을 함께 사용합니다."
+    updated["reason"] = "기상청 KIM 예측 온도, 풍속, 습도를 반영했습니다. 구름량과 강수는 아직 시나리오 값을 함께 사용합니다."
+    updated["valueSources"] = {
+        "temperature": "kma-kim",
+        "windSpeed": "kma-kim",
+        "humidity": "kma-kim" if kim_values.get("humidity") is not None else None,
+        "cloudCover": "scenario",
+        "rain": "scenario",
+    }
     return updated
 
 
